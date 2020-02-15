@@ -166,7 +166,7 @@ function render_fatal_error($exception=null) {
 
 /**
  * Localization function, its basically a shortcut for sprintf(gettext())
- * @param string $str the actual string to translate, with substritution markers as in printf()
+ * @param string $str the actual string to translate, with replacement markers as in printf()
  * @param mixed ... as many other values needed to substitute values into the translated string
  * @return string
  */

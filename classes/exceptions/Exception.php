@@ -104,7 +104,7 @@ class Exception extends \Exception
         $stack = ob_get_contents();
         ob_end_clean();
 
-        return "Si è verificato un errore fatale su BSS!
+        return "Si è verificato un errore fatale!
 
     Errore generico: " . $this->getMessage() . "
     Dettaglio Errore: " . $this->renderFullError() . "
