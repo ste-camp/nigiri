@@ -13,6 +13,11 @@ set_error_handler('error_to_exception_handler', E_ALL);
 set_exception_handler('uncaught_exception_handler');
 register_shutdown_function('fatal_error_handler');
 
+//Compatibilità con composer
+if(file_exists(__DIR__.'/vendor/autoload.php')){
+    require_once __DIR__.'/vendor/autoload.php';
+}
+
 $autoloader = new Psr4AutoloaderClass();
 $autoloader->register();
 $autoloader->addNamespace('nigiri', __DIR__.'/classes');
