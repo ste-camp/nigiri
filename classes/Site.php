@@ -19,7 +19,7 @@ class Site
     static private $params = [];
 
     /**
-     * @var ThemeInterface
+     * @var array
      */
     static private $theme;
 
@@ -36,16 +36,34 @@ class Site
     /** @var Psr4AutoloaderClass */
     static private $autoloader;
 
+    /**
+     * @param $data
+     * @throws Exception
+     * @throws \ReflectionException
+     * @throws exceptions\InternalServerError
+     */
     static function init($data)
     {
         if (empty($data['disableSession'])) {
             session_start();
         }
 
-        if (empty($data['theme']) or !($data['theme'] instanceof ThemeInterface)) {
+        if (empty($data['default_theme']) or !($data['theme'] instanceof ThemeInterface)) {
             throw new Exception("Nessun tema configurato per visualizzare il sito", 1,
-              "Non è stato specificato nessun tema o il tema specificato non implementa l'interfaccia ThemeInterface");
+              "Non è stato specificato nessun tema in configurazione");
         } else {
+            try {
+                $themeClass = new \ReflectionClass($data['default_theme']);
+                if (!$themeClass->implementsInterface("\\nigiri\\themes\\ThemeInterface")) {
+                    throw new Exception("Errore configurazione tema per visualizzare il sito", 2,
+                      "Il tema specificato non implementa l'interfaccia ThemeInterface");
+                }
+            }
+            catch(\ReflectionException $e){
+                throw new Exception("Errore configurazione tema per visualizzare il sito", 3,
+                  "Il tema specificato non esiste: " . $e->getMessage());
+            }
+
             self::$theme = $data['theme'];
         }
 
@@ -104,6 +122,7 @@ class Site
 
     public static function getTheme()
     {
+        //todo translate array into object
         return self::$theme;
     }
 

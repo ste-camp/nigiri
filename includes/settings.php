@@ -3,7 +3,10 @@
 use nigiri\themes\Theme;
 
 return [
-    'theme' => new Theme(),
+    'default_theme' => [
+      'class' => '\nigiri\themes\Theme',
+      'config' => []
+    ],
     'params' => [
         /** Website's Email address, used as sender of the emails and webmaster's contact */
         'email' => '',
