@@ -33,23 +33,27 @@ class Url
             }
         } else {
             $url = $l_page;
+            $language = empty($language) ? Site::getRouter()->getRequestedLanguage() : $language;
 
-            $boom = explode('/', $url);
-            $lang = Site::getParam("languages", []);
-            if (in_array($boom[0], $lang)) {
-                if(!empty($language)){
-                    array_shift($boom);
-                    $url = $language.'/'.implode('/', $boom);
+            if($url!='/') {
+                $boom = explode('/', $url);
+                $lang = Site::getParam("languages", []);
+                if (in_array($boom[0], $lang)) {
+                    if (!empty($language)) {
+                        array_shift($boom);
+                        $url = $language . '/' . implode('/', $boom);
+                    }
+                } else {
+                    $url = $language . '/' . implode('/', $boom);
                 }
             }
             else{
-                $language = empty($language)?Site::getRouter()->getRequestedLanguage():$language;
-                $url = $language.'/'.implode('/', $boom);
+                $url = $language . '/';
             }
         }
 
         if (!Site::getParam('clean_urls')) {
-            $url = 'index.php?page=' . $url;
+            $url = 'index.php?show_page=' . $url;
         }
 
         return self::make($url, $query, $absolute);
@@ -87,7 +91,11 @@ class Url
         }
 
         if (Site::getParam('url_prefix') != '') {
-            $url = '/' . Site::getParam('url_prefix') . $url;
+            $pre = Site::getParam('url_prefix');
+            if($pre[0]!='/'){
+                $pre = '/'.$pre;
+            }
+            $url = $pre . $url;
         } else {
             $url = '/' . $url;
         }
