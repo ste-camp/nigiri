@@ -19,9 +19,15 @@ class Site
     static private $params = [];
 
     /**
+     * Configuration array to build the actual Theme object
      * @var array
      */
-    static private $theme;
+    static private $themeConfig;
+
+    /**
+     * @var ThemeInterface
+     */
+    static private $theme = null;
 
     /**
      * @var Router
@@ -39,7 +45,6 @@ class Site
     /**
      * @param $data
      * @throws Exception
-     * @throws \ReflectionException
      * @throws exceptions\InternalServerError
      */
     static function init($data)
@@ -48,23 +53,13 @@ class Site
             session_start();
         }
 
-        if (empty($data['default_theme']) or !($data['theme'] instanceof ThemeInterface)) {
+        if (empty($data['default_theme'])) {
             throw new Exception("Nessun tema configurato per visualizzare il sito", 1,
               "Non è stato specificato nessun tema in configurazione");
         } else {
-            try {
-                $themeClass = new \ReflectionClass($data['default_theme']);
-                if (!$themeClass->implementsInterface("\\nigiri\\themes\\ThemeInterface")) {
-                    throw new Exception("Errore configurazione tema per visualizzare il sito", 2,
-                      "Il tema specificato non implementa l'interfaccia ThemeInterface");
-                }
-            }
-            catch(\ReflectionException $e){
-                throw new Exception("Errore configurazione tema per visualizzare il sito", 3,
-                  "Il tema specificato non esiste: " . $e->getMessage());
-            }
+            self::themeClassCheck($data['default_theme']);
 
-            self::$theme = $data['theme'];
+            self::$themeConfig = $data['theme'];
         }
 
         if (!empty($data['db'])) {
@@ -120,15 +115,16 @@ class Site
         return self::$router;
     }
 
+    /**
+     * @return ThemeInterface
+     */
     public static function getTheme()
     {
-        //todo translate array into object
-        return self::$theme;
-    }
+        if (self::$theme == null) {
+            self::$theme = self::buildTheme(self::$themeConfig);
+        }
 
-    public static function getAuth()
-    {
-        return self::$auth;
+        return self::$theme;
     }
 
     /**
@@ -142,8 +138,28 @@ class Site
     }
 
     /**
+     * @param $config
+     * @throws Exception
+     */
+    public static function switchThemeByConfig($config)
+    {
+        self::themeClassCheck($config);
+        self::$themeConfig = $config;
+        self::$theme = null;
+    }
+
+    /**
+     * @return Auth
+     */
+    public static function getAuth()
+    {
+        return self::$auth;
+    }
+
+    /**
      * Finds a static site parameter
      * @param $name
+     * @param mixed|null $default default value to return if the parameter is not found
      * @return mixed|null
      */
     public static function getParam($name, $default = null)
@@ -193,6 +209,45 @@ class Site
 
         foreach ($data as $prefix => $path) {
             self::$autoloader->addNamespace($prefix, $path);
+        }
+    }
+
+    /**
+     * Builds a Theme object from the theme config array
+     * @param $config
+     * @return ThemeInterface
+     * @throws Exception
+     */
+    private static function buildTheme($config)
+    {
+        $reflected = self::themeClassCheck($config);
+
+        if (!empty($config['config'])) {
+            return $reflected->newInstanceArgs($config['config']);
+        } else {
+            return $reflected->newInstanceArgs();
+        }
+    }
+
+    /**
+     * Checks the
+     * @param $config
+     * @return \ReflectionClass
+     * @throws Exception
+     */
+    private static function themeClassCheck($config)
+    {
+        try {
+            $themeClass = new \ReflectionClass($config['class']);
+            if (!$themeClass->implementsInterface("\\nigiri\\themes\\ThemeInterface")) {
+                throw new Exception("Errore configurazione tema per visualizzare il sito", 2,
+                  "Il tema specificato non implementa l'interfaccia ThemeInterface");
+            }
+
+            return $themeClass;
+        } catch (\ReflectionException $e) {
+            throw new Exception("Errore configurazione tema per visualizzare il sito", 3,
+              "Il tema specificato non esiste: " . $e->getMessage());
         }
     }
 }

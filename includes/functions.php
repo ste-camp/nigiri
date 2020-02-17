@@ -152,11 +152,18 @@ function render_fatal_error($exception=null) {
             $content = Controller::renderView($boom[1], ['exception' => $exception]);
         }
         catch(FileNotFound $e){//Don't throw another uncaught exception
+            error_log("Can't render exception view " . $boom[1] . ": " . $e->getMessage());
             $boom[1] = '';
         }
     }
     if(empty($boom[1])){
-        $content = Controller::renderView(dirname(__DIR__).'/classes/views/fatal_error', ['exception' => $exception]);
+        try {
+            $content = Controller::renderView(dirname(__DIR__) . '/classes/views/fatal_error',
+              ['exception' => $exception]);
+        } catch (FileNotFound $e) {
+            error_log("Can't render default exception view: " . $e->getMessage());
+            $content = '';
+        }
     }
 
     Site::getTheme()->append($content, 'body');

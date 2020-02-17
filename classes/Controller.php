@@ -8,6 +8,8 @@ use nigiri\plugins\PluginInterface;
  * Interface for all the controllers of the site
  */
 abstract class Controller{
+    protected $default_theme_config = null;
+
     public function __construct(){
 
     }
@@ -19,6 +21,17 @@ abstract class Controller{
      */
     protected function plugins(){
         return [];
+    }
+
+    /**
+     * Returns the configuration array to build the default theme for this controller
+     * If null is returned the default theme from the site configuration will be used, unless some other code changes it
+     *
+     * @param string $actionName the name of the action that's going to be executed
+     * @return null
+     */
+    public function getDefaultControllerThemeConfig($actionName){
+        return $this->default_theme_config;
     }
 
     /**

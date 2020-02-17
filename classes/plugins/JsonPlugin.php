@@ -1,9 +1,11 @@
 <?php
+
 namespace nigiri\plugins;
 
 use nigiri\Controller;
 
-class JsonPlugin implements PluginInterface{
+class JsonPlugin implements PluginInterface
+{
 
     private $config = [];
 
@@ -20,11 +22,11 @@ class JsonPlugin implements PluginInterface{
     {
         $action = Controller::camelCaseToUnderscore($actionName);
 
-        if(in_array($action, $this->config) or in_array('*',$this->config)){
+        if (in_array($action, $this->config) or in_array('*', $this->config)) {
             header('Content-Type: application/json; charset=utf-8');
+
             return json_encode($actionOutput);
-        }
-        else{
+        } else {
             return $actionOutput;
         }
     }

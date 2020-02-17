@@ -12,13 +12,26 @@ class LayoutTheme extends Theme
 {
     private $layoutPath;
 
+    /**
+     * LayoutTheme constructor.
+     * @param string $layout the file containing the layout (absolute or relative to /views folder). It gets passed a LayoutData object as $layoutData variable. If empty, layout.php will be searched into /views folder or fallback to the nigiri default layout
+     * @throws InternalServerError
+     */
     public function __construct($layout = '')
     {
         if(!empty($layout)){
-            if(file_exists($layout)){
-                $this->layoutPath = $layout;
+            $pathsToCheck = [//Places to look for specified layout file, order matters!
+                $layout,
+                dirname(dirname(__DIR__)).'/views/'.$layout
+            ];
+            foreach($pathsToCheck as $path) {
+                if(file_exists($path)){
+                    $this->layoutPath = $path;
+                    break;
+                }
             }
-            else{
+
+            if(empty($this->layoutPath)){//if not found, fallback to default layout
                 $layout = '';
             }
         }

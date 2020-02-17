@@ -57,6 +57,8 @@ class Router{
      * Calls the actual controller and method that should handle the request
      * @return string the HTML code to include in the output body
      * @throws FileNotFound
+     * @throws \ReflectionException
+     * @throws exceptions\Exception
      */
     public function routeRequest()
     {
@@ -66,11 +68,21 @@ class Router{
             if($class->isSubclassOf('nigiri\Controller')) {
                 /** @var Controller $instance */
                 $instance = $class->newInstance();
+
+                $action = null;
                 if ($class->hasMethod($this->action)) {
-                    return $instance->executeAction($this->action);
+                    $action = $this->action;
                 } elseif ($class->hasMethod('action' . ucfirst($this->action))) {
-                    return $instance->executeAction('action'.ucfirst($this->action));
+                    $action = 'action' . ucfirst($this->action);
                 }
+
+                //Enable the controller to have its own default theme
+                $controller_theme = $instance->getDefaultControllerThemeConfig($action);
+                if($controller_theme != null){
+                    Site::switchThemeByConfig($controller_theme);
+                }
+
+                return $instance->executeAction($action);
             }
         }
         ob_end_clean();
