@@ -77,19 +77,20 @@ class Url
      */
     public static function toAction($action = '', $controller = '', $query = '', $absolute = false, $language = '')
     {
-        if(empty($action)){
+        if (empty($action)) {
             $action = Site::getRouter()->getActionName();
         }
-        if(empty($controller)){
+        if (empty($controller)) {
             $controller = Site::getRouter()->getControllerName();
         }
 
         $action = Controller::camelCaseToUnderscore($action);
         $controller[0] = strtolower($controller[0]);
-        if(strrpos($controller, "Controller") === strlen($controller) - 10) {//if it ends with "Controller"
+        if (strrpos($controller, "Controller") === strlen($controller) - 10) {//if it ends with "Controller"
             $controller = substr($controller, 0, -10);
         }
         $controller = Controller::camelCaseToUnderscore($controller);
+
         return self::to($controller . '/' . $action, $query, $absolute, $language);
     }
 

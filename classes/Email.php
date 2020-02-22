@@ -1,5 +1,7 @@
 <?php
+
 namespace nigiri;
+
 use nigiri\exceptions\Exception;
 use nigiri\views\Html;
 use nigiri\views\Url;
@@ -18,7 +20,7 @@ class Email
     {
         require_once(dirname(__DIR__) . '/libraries/PHPMailer/class.phpmailer.php');
         $this->mail = new \PHPMailer();
-        $this->mail->PluginDir = dirname(__DIR__).'/libraries/PHPMailer/';
+        $this->mail->PluginDir = dirname(__DIR__) . '/libraries/PHPMailer/';
         $this->mail->CharSet = 'utf-8';
     }
 
@@ -69,7 +71,7 @@ class Email
                 $this->mail->Sender = Site::getParam('email');
             }
 
-            if($html){
+            if ($html) {
                 $this->mail->IsHTML();
             }
 
@@ -111,13 +113,15 @@ class Email
             }
         } catch (\phpmailerException $e) {
             Exception::watchdog("Errore invio email (eccezione): " . $e->errorMessage()); //Pretty error messages from PHPMailer
+
             return false;
         }
 
         return true;
     }
 
-    public function addRecipients($to){
+    public function addRecipients($to)
+    {
         if (is_array($to)) {
             if ($this->is_email_array($to)) {
                 $to['to'][] = $to;
@@ -145,7 +149,8 @@ class Email
         return $this;
     }
 
-    public function addAttachment($path, $name=''){
+    public function addAttachment($path, $name = '')
+    {
         $this->mail->AddAttachment($path, $name);
     }
 

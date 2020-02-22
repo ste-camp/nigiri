@@ -19,38 +19,39 @@ class LayoutTheme extends Theme
      */
     public function __construct($layout = '')
     {
-        if(!empty($layout)){
+        if (!empty($layout)) {
             $pathsToCheck = [//Places to look for specified layout file, order matters!
-                $layout,
-                dirname(dirname(__DIR__)).'/views/'.$layout
+              $layout,
+              dirname(dirname(__DIR__)) . '/views/' . $layout
             ];
-            foreach($pathsToCheck as $path) {
-                if(file_exists($path)){
+            foreach ($pathsToCheck as $path) {
+                if (file_exists($path)) {
                     $this->layoutPath = $path;
                     break;
                 }
             }
 
-            if(empty($this->layoutPath)){//if not found, fallback to default layout
+            if (empty($this->layoutPath)) {//if not found, fallback to default layout
                 $layout = '';
             }
         }
 
-        if(empty($layout)){
+        if (empty($layout)) {
             $pathsToCheck = [//Places to automatically look for layout file, order matters!
-              dirname(dirname(__DIR__)).'/views/layout.php',
-              dirname(__DIR__).'/views/layout.php'
+              dirname(dirname(__DIR__)) . '/views/layout.php',
+              dirname(__DIR__) . '/views/layout.php'
             ];
 
-            foreach($pathsToCheck as $path){
-                if(file_exists($path)){
+            foreach ($pathsToCheck as $path) {
+                if (file_exists($path)) {
                     $this->layoutPath = $path;
                     break;
                 }
             }
 
-            if(empty($this->layoutPath)){//No file found :(
-                throw new InternalServerError("Errore nel tema", "Il layout per il tema non è stato trovato nei percorsi automatici");
+            if (empty($this->layoutPath)) {//No file found :(
+                throw new InternalServerError("Errore nel tema",
+                  "Il layout per il tema non è stato trovato nei percorsi automatici");
             }
         }
     }

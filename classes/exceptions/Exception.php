@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri\exceptions;
 
 use nigiri\db\DBException;
@@ -89,9 +90,9 @@ class Exception extends \Exception
 
         try {
             $m = new Email();
-            @$m->addRecipients($email)->send(Site::getParam('site_name') . ': Errore Fatale!', $this->renderEmailText());
-        }
-        catch (Exception $e){
+            @$m->addRecipients($email)->send(Site::getParam('site_name') . ': Errore Fatale!',
+              $this->renderEmailText());
+        } catch (Exception $e) {
             //Nothing we are already dealing with an error
         }
     }
@@ -114,26 +115,26 @@ class Exception extends \Exception
     Call Stack:" . $stack;
     }
 
-    public function unCaughtEffect(){
+    public function unCaughtEffect()
+    {
         header('HTTP/1.0 500 Internal Server Error', true, 500);
     }
 
     /**
      * Aggiunge una linea nel log degli errori
      * @param $msg : il messaggio da inserire
-     * @param $user: opzionale, l'utente che ha eseguito l'azione che ha scatenato l'errore
+     * @param $user : opzionale, l'utente che ha eseguito l'azione che ha scatenato l'errore
      */
     static public function watchdog($msg, $user = "")
     {
-        if(Site::DB()!==null) {
+        if (Site::DB() !== null) {
             try {
                 Site::DB()->query("INSERT INTO LogErrori (Nome, Errore, DataEvento, IP) VALUES ('" . Site::DB()->escape($user) . "','" . Site::DB()->escape($msg) . "',NOW(),'" . Site::DB()->escape($_SERVER['REMOTE_ADDR']) . "')");
             } catch (DBException $e) {
                 //Se fallisce perfino questo...registriamo l'errore con l'handler di default di PHP
                 error_log($msg);
             }
-        }
-        else{//No DB enabled
+        } else {//No DB enabled
             error_log($msg);
         }
     }
@@ -142,13 +143,15 @@ class Exception extends \Exception
      * Gets the Theme class configured to handle the screen rendering of this Exception
      * @return string
      */
-    public function getThemeClass(){
+    public function getThemeClass()
+    {
         $className = get_called_class();
         $overrides = Site::getParam('exceptions_views', []);
 
-        if(array_key_exists($className, $overrides)){
+        if (array_key_exists($className, $overrides)) {
             return $overrides[$className];
         }
+
         return $this->theme;
     }
 }

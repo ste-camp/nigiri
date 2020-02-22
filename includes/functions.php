@@ -1,4 +1,5 @@
 <?php
+
 use nigiri\Controller;
 use nigiri\db\DBException;
 use nigiri\exceptions\Exception;
@@ -13,7 +14,8 @@ use nigiri\views\Html;
  * @param string $buffer
  * @return string $buffer without the BOM
  */
-function no_bom($buffer) {
+function no_bom($buffer)
+{
     return str_replace("\xef\xbb\xbf", '', $buffer);
 }
 
@@ -24,13 +26,15 @@ function no_bom($buffer) {
  * @param array $vars an array of variables to pass to the included file @see extract()
  * @return string the final output of the included file
  */
-function page_include($path, $vars = array()) {
+function page_include($path, $vars = array())
+{
     if (file_exists($path)) {
         ob_start();
         extract($vars);
         include($path);
         $output = no_bom(ob_get_contents());
         ob_end_clean();
+
         return $output;
     }
 }
@@ -44,21 +48,19 @@ function page_include($path, $vars = array()) {
  * @param array $errcontext
  * @throws PHPErrorException
  */
-function error_to_exception_handler($errno, $errstr, $errfile='', $errline='', $errcontext=array()){
-    if(error_reporting() & $errno){
-        $e= new PHPErrorException($errno, $errstr, $errfile, $errline, $errcontext);
-        if(PHPErrorException::isFatal($errno)){
+function error_to_exception_handler($errno, $errstr, $errfile = '', $errline = '', $errcontext = array())
+{
+    if (error_reporting() & $errno) {
+        $e = new PHPErrorException($errno, $errstr, $errfile, $errline, $errcontext);
+        if (PHPErrorException::isFatal($errno)) {
             throw $e;
-        }
-        else{
-            if(ini_get('log_errors')){
+        } else {
+            if (ini_get('log_errors')) {
                 $e->logToErrorLog();
-            }
-            else {
+            } else {
                 if (defined('DEBUG') and DEBUG) {
                     echo '<p class="error">' . nl2br(Html::escape($e->renderFullError())) . "</p>";
-                }
-                else {
+                } else {
                     echo '<p class="error">' . $e->showError() . '</p>';
                 }
             }
@@ -70,21 +72,20 @@ function error_to_exception_handler($errno, $errstr, $errfile='', $errline='', $
  * Redirects to error_to_exception_handler() all of fatal errors that don't get intercepted with set_error_handler()
  * @throws PHPErrorException
  */
-function fatal_error_handler(){
+function fatal_error_handler()
+{
     $last = error_get_last();
-    if($last===null){
+    if ($last === null) {
         return;
-    }
-    /*
+    } /*
      * Throw only if it's a fatal error, otherwise we risk throwing
      * two times for the same error as it would have been already thrown with set_error_handler()
      */
-    elseif(PHPErrorException::isFatal($last['type'])){
+    elseif (PHPErrorException::isFatal($last['type'])) {
         //Uncaught Exceptions handler has already been unregistered at this point! We need to manually catch and redirect
         try {
             error_to_exception_handler($last['type'], $last['message'], $last['file'], $last['line']);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             uncaught_exception_handler($e);
         }
     }
@@ -94,24 +95,23 @@ function fatal_error_handler(){
  * Gestisce le uncaught exception
  * @param $e \Exception
  */
-function uncaught_exception_handler($e){
-    if($e instanceof Exception){
-        if(ini_get('log_errors')) {
+function uncaught_exception_handler($e)
+{
+    if ($e instanceof Exception) {
+        if (ini_get('log_errors')) {
             $e->logToErrorLog();
         }
 
-        try{//if possibile log to db
-            $e->logError('Catch di emergenza',true);
-        }
-        catch(DBException $ex) {//if db is unavailable, log to email
+        try {//if possibile log to db
+            $e->logError('Catch di emergenza', true);
+        } catch (DBException $ex) {//if db is unavailable, log to email
             $e->logToWebmasterEmail();
         }
 
         $e->unCaughtEffect();
 
         render_fatal_error($e);
-    }
-    else{
+    } else {
         render_fatal_error($e);
     }
 }
@@ -120,43 +120,40 @@ function uncaught_exception_handler($e){
  * Renders the Fatal Error/Program Panic screen
  * @param $exception Exception
  */
-function render_fatal_error($exception=null) {
-    while(ob_get_level()>0){
+function render_fatal_error($exception = null)
+{
+    while (ob_get_level() > 0) {
         ob_end_clean();
     }
 
-    if($exception!=null and $exception instanceof Exception) {
+    if ($exception != null and $exception instanceof Exception) {
         $th = $exception->getThemeClass();
         $boom = explode(':', $th);
-    }
-    else{
-        $boom = ['',''];
+    } else {
+        $boom = ['', ''];
     }
 
-    if(!empty($boom[0])){
+    if (!empty($boom[0])) {
         $class = new ReflectionClass($boom[0]);
-        if($class->implementsInterface('nigiri\\themes\\ThemeInterface')){
+        if ($class->implementsInterface('nigiri\\themes\\ThemeInterface')) {
             Site::switchTheme($class->newInstance());
-        }
-        else{
+        } else {
             Site::getTheme()->resetPart('body');
         }
-    }
-    else{
+    } else {
         Site::getTheme()->resetPart('body');
     }
 
     $content = '';
-    if(!empty($boom[1])){
+    if (!empty($boom[1])) {
         try {
             $content = Controller::renderView($boom[1], ['exception' => $exception]);
-        }
-        catch(FileNotFound $e){//Don't throw another uncaught exception
+        } catch (FileNotFound $e) {//Don't throw another uncaught exception
             error_log("Can't render exception view " . $boom[1] . ": " . $e->getMessage());
             $boom[1] = '';
         }
     }
-    if(empty($boom[1])){
+    if (empty($boom[1])) {
         try {
             $content = Controller::renderView(dirname(__DIR__) . '/classes/views/fatal_error',
               ['exception' => $exception]);
@@ -177,14 +174,16 @@ function render_fatal_error($exception=null) {
  * @param mixed ... as many other values needed to substitute values into the translated string
  * @return string
  */
-function l(){
+function l()
+{
     $argc = func_num_args();
     $argv = func_get_args();
-    if($argc>0){
+    if ($argc > 0) {
         $argv[0] = _($argv[0]);
-        if($argc > 1) {
+        if ($argc > 1) {
             $argv[0] = call_user_func_array('sprintf', $argv);
         }
+
         return $argv[0];
     }
 }

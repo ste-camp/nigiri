@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri\models;
 
 use nigiri\db\DB;
@@ -41,9 +42,9 @@ abstract class Model
      * @param $info : Opzionale. è possibile passare un array o un @see DbResult per precaricare dati nell'oggetto
      *                    senza fare query aggiuntive. In caso di DbResult viene considerato solo il primo record
      *                    I campi del risultato o le chiavi dell'array devono corrispondere a nomi di attributi come
-     *                    definiti in @see static::getAttributesMap() o a veri campi sul DB o ad associazioni con il pattern:
+     *                    definiti in @param $apply_callback : Opzionale. Indica se sui dati in $info è necessario applicare la callback di lettura (@see self::getAttributesMap() 'after_read'). Default true
+     * @see static::getAttributesMap() o a veri campi sul DB o ad associazioni con il pattern:
      *                    <NomeAssociazione>_<nomeAttributoAssociazione>
-     * @param $apply_callback : Opzionale. Indica se sui dati in $info è necessario applicare la callback di lettura (@see self::getAttributesMap() 'after_read'). Default true
      */
     public function __construct($auto_load = false, $info = array(), $apply_callback = true)
     {
@@ -330,7 +331,7 @@ abstract class Model
                         return true;
                     case 'read':
                         return (!empty($add_opt['table']) ? '`' . $add_opt['table'] . "`." : '') . '`' . $a_value . '`' . (!empty
-                        ($add_opt['prefix']) ? " AS " . $add_opt['prefix'] . $a_value : '');
+                          ($add_opt['prefix']) ? " AS " . $add_opt['prefix'] . $a_value : '');
                     case 'name':
                     default://name and read are the same
                         return $a_value;
@@ -724,9 +725,9 @@ abstract class Model
     /**
      * Finds only one record
      * WARNING: this function overwrites the value of $search['search_limit']
-     * @see Model::find()
      * @param array $search
      * @return static the first result in the research
+     * @see Model::find()
      */
     public static function findOne($search = array())
     {
@@ -743,7 +744,8 @@ abstract class Model
      * Cerca record nel database
      * @param $search : un array con le condizioni di ricerca.
      *                Le chiavi dell'array possono essere nomi di campi del database o nomi di attributi con la
-     *                corrispondenza data in @see static::getAttributesMap(). Se la corrispondenza coinvolge delle
+     *                corrispondenza data in @return static[] di oggetti che rappresentano record che rispettano le condizioni di $search
+     * @see static::getAttributesMap(). Se la corrispondenza coinvolge delle
      *                callback, verrà usata quella di scrittura ('write') sul valore da ricercare
      *                Se un elemento corrispondente a una chiave con il nome di un attributo è un array, verrà ricercata
      *                al suo interno la chiave 'op' che indica l'operatore da utilizzare per il confronto (di default viene
@@ -769,7 +771,6 @@ abstract class Model
      *                Se una chiave è search_fields ed è un array, i valori in esso contenuti saranno considerati come
      *                i nomi dei campi o degli attributi da caricare inizialmente negli oggetti, possono anche essere
      *                attributi di associazioni (DEVONO essere specificati nella forma <associazione>.<attributo>)
-     * @return static[] di oggetti che rappresentano record che rispettano le condizioni di $search
      */
     public static function find($search = array())
     {
@@ -897,9 +898,9 @@ abstract class Model
                         }
                     }
 
-                    if($operatore=='=' && $value===null){
-                        $operatore='IS NULL';
-                        $value=[];
+                    if ($operatore == '=' && $value === null) {
+                        $operatore = 'IS NULL';
+                        $value = [];
                     }
 
                     if (is_array($value)) {
@@ -1182,11 +1183,11 @@ abstract class Model
      * @param string $name : il nome di un attributo. Non può essere la chiave primaria
      * @param mixed $value : il valore a cui settare il campo, NON deve essere già stato passato in DB::escape() ma deve
      * essere comunque un valore pronto per passarci
-     *                o per passare nella sua callback di scrittura (@see self::getAttributesMap() 'write'). La callback viene applicata solo al valore inserito nella query al DB,
-     *                non in valore assegnato alla cache interna dell'oggetto è esattamente il valore di $value senza che sia passato attraverso alcuna callback
-     * @return bool true se la modifica è andata a buon fine, false altrimenti. Eventuali errori sono memorizzati in
+     *                o per passare nella sua callback di scrittura (@return bool true se la modifica è andata a buon fine, false altrimenti. Eventuali errori sono memorizzati in
      * watchdog
      * @throws ModelException se $name non è un attributo della classe o se è la chiave primaria
+     * @see self::getAttributesMap() 'write'). La callback viene applicata solo al valore inserito nella query al DB,
+     *                non in valore assegnato alla cache interna dell'oggetto è esattamente il valore di $value senza che sia passato attraverso alcuna callback
      */
     public function setAttribute($name, $value)
     {
@@ -1237,8 +1238,8 @@ abstract class Model
     }
 
     /**
-     * Salva tutte le informazioni dell'oggetto sul DB. Utile nel caso di utilizzo di @see $this->setNoSave() o del caricamento dati nuovi dal costruttore
-     * @return true se il salvataggio è andato a buon fine. False altrimenti. Eventuali errori sono registrati su watchdog
+     * Salva tutte le informazioni dell'oggetto sul DB. Utile nel caso di utilizzo di @return true se il salvataggio è andato a buon fine. False altrimenti. Eventuali errori sono registrati su watchdog
+     * @see $this->setNoSave() o del caricamento dati nuovi dal costruttore
      */
     public function save()
     {

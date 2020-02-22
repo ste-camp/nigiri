@@ -1,7 +1,9 @@
 <?php
+
 namespace nigiri\plugins;
 
-interface PluginInterface{
+interface PluginInterface
+{
     public function __construct($config);
 
     public function beforeAction($actionName);

@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri\rbac;
 
 use nigiri\Controller;
@@ -7,7 +8,8 @@ use nigiri\exceptions\Forbidden;
 use nigiri\plugins\PluginInterface;
 use nigiri\Site;
 
-class AuthPlugin implements PluginInterface{
+class AuthPlugin implements PluginInterface
+{
 
     const DENY = -1;
     const ALLOW = 1;
@@ -23,10 +25,9 @@ class AuthPlugin implements PluginInterface{
     {
         $this->config = $config;
 
-        if(!empty($config['policy'])){
+        if (!empty($config['policy'])) {
             $this->policy = $this->policyEvaluation($config['policy']);
-        }
-        else{
+        } else {
             $this->policy = self::DENY;
         }
     }
@@ -35,17 +36,17 @@ class AuthPlugin implements PluginInterface{
     {
         $policy = $this->policy;
         $allow = true;
-        if(!empty($this->config['rules'])){
+        if (!empty($this->config['rules'])) {
             $raw_p = null;
             $under = Controller::camelCaseToUnderscore($actionName);
-            foreach($this->config['rules'] as $rule){
-                if(in_array($under, $rule['actions'])){
+            foreach ($this->config['rules'] as $rule) {
+                if (in_array($under, $rule['actions'])) {
                     $raw_p = $rule;
                     break;
                 }
             }
 
-            if(!empty($raw_p)) {
+            if (!empty($raw_p)) {
                 $allow = array_key_exists('allow', $raw_p) ? (boolean)$raw_p['allow'] : true;
                 $policy = $this->policyEvaluation($raw_p['policy']);
             }
@@ -65,37 +66,34 @@ class AuthPlugin implements PluginInterface{
      * Permission or Role matches correctly, Allow Policies trigger HTTP403 when none matches
      * @throws Forbidden
      */
-    private function applyPolicy($p, $isAllow = true){
-        if($p == self::ALLOW){
+    private function applyPolicy($p, $isAllow = true)
+    {
+        if ($p == self::ALLOW) {
             return;
-        }
-        elseif($p == self::DENY){
+        } elseif ($p == self::DENY) {
             throw new Forbidden();
-        }
-        elseif(is_array($p)){
+        } elseif (is_array($p)) {
             $match = false;
-            foreach($p as $temp){
-                if(is_int($temp) && $temp == Role::AUTHENTICATED_USER){
-                    if(Site::getAuth()->isLoggedIn()){
+            foreach ($p as $temp) {
+                if (is_int($temp) && $temp == Role::AUTHENTICATED_USER) {
+                    if (Site::getAuth()->isLoggedIn()) {
                         $match = true;
                         break;
                     }
-                }
-                elseif($temp instanceof Permission){
-                    if(Site::getAuth()->iCan($p)){
+                } elseif ($temp instanceof Permission) {
+                    if (Site::getAuth()->iCan($p)) {
                         $match = true;
                         break;
                     }
-                }
-                elseif($temp instanceof Role){
-                    if(Site::getAuth()->userHasRole(Site::getAuth()->getLoggedInUser(), $p)){
+                } elseif ($temp instanceof Role) {
+                    if (Site::getAuth()->userHasRole(Site::getAuth()->getLoggedInUser(), $p)) {
                         $match = true;
                         break;
                     }
                 }
             }
 
-            if(($match && $isAllow) || (!$match && !$isAllow)){
+            if (($match && $isAllow) || (!$match && !$isAllow)) {
                 return;
             }
 
@@ -103,43 +101,39 @@ class AuthPlugin implements PluginInterface{
         }
     }
 
-    private function policyEvaluation($p){
-        if(!empty($p)){
-            if($p === self::ALLOW || $p === self::DENY){
+    private function policyEvaluation($p)
+    {
+        if (!empty($p)) {
+            if ($p === self::ALLOW || $p === self::DENY) {
                 return $p;
-            }
-            else{
-                if(!is_array($p)){
+            } else {
+                if (!is_array($p)) {
                     $p = [$p];
                 }
 
                 $out = [];
-                foreach($p as $temp){
-                    if(is_string($temp)){
-                        try{
+                foreach ($p as $temp) {
+                    if (is_string($temp)) {
+                        try {
                             $out[] = new Permission($p);
-                        }
-                        catch(Exception $e){//It's not a valid permission name
+                        } catch (Exception $e) {//It's not a valid permission name
                             $r = Site::getAuth()->getRole($p);
-                            if(!empty($r)){
+                            if (!empty($r)) {
                                 $out[] = $r;
                             }
                         }
-                    }
-                    elseif(is_int($temp) && $p == Role::AUTHENTICATED_USER){
+                    } elseif (is_int($temp) && $p == Role::AUTHENTICATED_USER) {
                         $out[] = Role::AUTHENTICATED_USER;
                     }
                 }
 
-                if(empty($out)){
+                if (empty($out)) {
                     return self::DENY;
-                }
-                else{
+                } else {
                     return $out;
                 }
             }
-        }
-        else{
+        } else {
             return self::DENY;
         }
     }

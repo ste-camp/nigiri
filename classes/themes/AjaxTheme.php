@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri\themes;
 
 /**
@@ -8,8 +9,9 @@ namespace nigiri\themes;
  *
  * @package nigiri\themes
  */
-class AjaxTheme implements ThemeInterface {
-    private $body=null;
+class AjaxTheme implements ThemeInterface
+{
+    private $body = null;
 
     public function append($str, $part = 'body')
     {

@@ -1,5 +1,7 @@
 <?php
+
 namespace nigiri\rbac;
+
 use nigiri\exceptions\Exception;
 
 /**
@@ -7,7 +9,8 @@ use nigiri\exceptions\Exception;
  * They are not stored on the DB since they are closely tied to the code.
  * We store them here, like some kind of enumeration
  */
-class Permission{
+class Permission
+{
     /** @var array the list of permissions in the site */
     static private $permissions = [];
 
@@ -18,20 +21,22 @@ class Permission{
 
     public function __construct($name)
     {
-        if(array_key_exists($name, self::getPermissions())){
+        if (array_key_exists($name, self::getPermissions())) {
             $this->p = $name;
-        }
-        else{
+        } else {
             throw new Exception("Il permesso specificato non esiste");
         }
     }
 
-    public function getName(){
+    public function getName()
+    {
         return $this->p;
     }
 
-    public function getDescription(){
+    public function getDescription()
+    {
         $p = self::getPermissions();
+
         return $p[$this->p];
     }
 
@@ -42,15 +47,18 @@ class Permission{
      * @param string $name
      * @param string $description
      */
-    static public function addPermission($name, $description){
+    static public function addPermission($name, $description)
+    {
         $p = self::getPermissions();
         $p[$name] = $description;
     }
 
-    static public function getPermissions(){
-        if(empty(self::$permissions)){
-            self::loadFile(self::$permissions, dirname(dirname(__DIR__)).'/includes/permissions.php');
+    static public function getPermissions()
+    {
+        if (empty(self::$permissions)) {
+            self::loadFile(self::$permissions, dirname(dirname(__DIR__)) . '/includes/permissions.php');
         }
+
         return self::$permissions;
     }
 
@@ -58,15 +66,18 @@ class Permission{
      * Returns the index of the permissions, to sort them in categories
      * @return array
      */
-    static public function getIndex(){
-        if(empty(self::$permissions_index)){
-            self::loadFile(self::$permissions_index, dirname(dirname(__DIR__)).'/includes/permissions_index.php');
+    static public function getIndex()
+    {
+        if (empty(self::$permissions_index)) {
+            self::loadFile(self::$permissions_index, dirname(dirname(__DIR__)) . '/includes/permissions_index.php');
         }
+
         return self::$permissions_index;
     }
 
-    static private function loadFile(&$var, $file){
-        if(file_exists($file)){
+    static private function loadFile(&$var, $file)
+    {
+        if (file_exists($file)) {
             $var = require $file;
         }
     }

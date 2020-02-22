@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri;
 
 use nigiri\exceptions\FileNotFound;
@@ -7,10 +8,12 @@ use nigiri\plugins\PluginInterface;
 /**
  * Interface for all the controllers of the site
  */
-abstract class Controller{
+abstract class Controller
+{
     protected $default_theme_config = null;
 
-    public function __construct(){
+    public function __construct()
+    {
 
     }
 
@@ -19,7 +22,8 @@ abstract class Controller{
      * their code before or after it
      * @return array
      */
-    protected function plugins(){
+    protected function plugins()
+    {
         return [];
     }
 
@@ -30,7 +34,8 @@ abstract class Controller{
      * @param string $actionName the name of the action that's going to be executed
      * @return null
      */
-    public function getDefaultControllerThemeConfig($actionName){
+    public function getDefaultControllerThemeConfig($actionName)
+    {
         return $this->default_theme_config;
     }
 
@@ -41,23 +46,24 @@ abstract class Controller{
      * @return string the generated HTML code
      * @throws FileNotFound
      */
-    static public function renderView($path, $args= []){
+    static public function renderView($path, $args = [])
+    {
         $def_lan = Site::getParam('default_language');
         $current_lan = Site::getRouter()->getRequestedLanguage();
 
         $try = [
             //View in a folder for the current language
-            dirname(__DIR__).'/views/'.$current_lan.'/'.$path.'.php',
+          dirname(__DIR__) . '/views/' . $current_lan . '/' . $path . '.php',
             //View in a folder for the default language
-            dirname(__DIR__).'/views/'.$def_lan.'/'.$path.'.php',
+          dirname(__DIR__) . '/views/' . $def_lan . '/' . $path . '.php',
             //View in a folder with no language
-            dirname(__DIR__).'/views/'.$path.'.php',
+          dirname(__DIR__) . '/views/' . $path . '.php',
             //Exact location of the view is specified in $path
-            $path.'.php'
+          $path . '.php'
         ];
 
-        foreach($try as $t){
-            if(file_exists($t)){
+        foreach ($try as $t) {
+            if (file_exists($t)) {
                 return page_include($t, $args);
             }
         }
@@ -70,15 +76,16 @@ abstract class Controller{
      * @param $action
      * @return string
      */
-    public function executeAction($action){
+    public function executeAction($action)
+    {
         /** @var PluginInterface[] $plugins */
         $plugins = [];
 
         //Setup Plugins and execute beforeAction()
-        foreach($this->plugins() as $plugin){
-            if(!empty($plugin['class']) and class_exists($plugin['class'])){
+        foreach ($this->plugins() as $plugin) {
+            if (!empty($plugin['class']) and class_exists($plugin['class'])) {
                 $refl = new \ReflectionClass($plugin['class']);
-                if($refl->implementsInterface('nigiri\\plugins\\PluginInterface')) {
+                if ($refl->implementsInterface('nigiri\\plugins\\PluginInterface')) {
                     unset($plugin['class']);
                     /** @var PluginInterface $p */
                     $p = $refl->newInstance($plugin);
@@ -93,34 +100,34 @@ abstract class Controller{
         $output = $this->$action();
 
         //Execute afterAction() on the output
-        foreach($plugins as $plugin){
+        foreach ($plugins as $plugin) {
             $output = $plugin->afterAction($action, $output);
         }
 
         return $output;
     }
 
-    static public function camelCaseToUnderscore($action){
-        if(strpos($action, 'action')===0){
+    static public function camelCaseToUnderscore($action)
+    {
+        if (strpos($action, 'action') === 0) {
             $action = substr($action, 6);
             $action[0] = strtolower($action[0]);
         }
 
         $output = '';
-        for($i=0; $i<strlen($action); $i++){
+        for ($i = 0; $i < strlen($action); $i++) {
             $ord = ord($action[$i]);
-            if($ord >= 65 && $ord <= 90){
-                if($i==0){
+            if ($ord >= 65 && $ord <= 90) {
+                if ($i == 0) {
                     $output .= strtolower($action[$i]);
-                }
-                else {
+                } else {
                     $output .= '_' . strtolower($action[$i]);
                 }
-            }
-            else{
+            } else {
                 $output .= $action[$i];
             }
         }
+
         return $output;
     }
 
@@ -130,10 +137,11 @@ abstract class Controller{
      * @param bool $first_upper tells whether the first letter should be capitalized or not. Default true
      * @return string
      */
-    static public function underscoreToCamelCase($str, $first_upper = true){
+    static public function underscoreToCamelCase($str, $first_upper = true)
+    {
         $out = str_replace(' ', '', ucwords(str_replace('_', ' ', $str)));
 
-        if(!$first_upper){
+        if (!$first_upper) {
             $out[0] = strtolower($out[0]);
         }
 

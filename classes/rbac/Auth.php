@@ -1,4 +1,5 @@
 <?php
+
 namespace nigiri\rbac;
 
 use nigiri\db\DBException;
@@ -10,23 +11,26 @@ use nigiri\Site;
  * The Authorization/Authentication Component
  * It implements a RBAC Authorization structure
  */
-class Auth{
+class Auth
+{
 
     /** @var AuthUserInterface the currently logged in user */
     private $user = null;
     private $userClass = null;
 
-    public function __construct($userClass){
+    public function __construct($userClass)
+    {
         try {
             $c = new \ReflectionClass($userClass);
             if ($c->implementsInterface('nigiri\\rbac\\AuthUserInterface')) {
                 $this->userClass = $c;
             } else {
-                throw new InternalServerError("Configurazione errata", "La classe utente specificata per l'autorizzazione non è valida");
+                throw new InternalServerError("Configurazione errata",
+                  "La classe utente specificata per l'autorizzazione non è valida");
             }
-        }
-        catch (\ReflectionException $e){
-            throw new InternalServerError("Configurazione errata", "La classe utente specificata per l'autorizzazione non esiste");
+        } catch (\ReflectionException $e) {
+            throw new InternalServerError("Configurazione errata",
+              "La classe utente specificata per l'autorizzazione non esiste");
         }
     }
 
@@ -36,19 +40,19 @@ class Auth{
      * @param string|Role $r the role name
      * @throws DBException
      */
-    public function assignPerm($p,$r){
-        if(!($p instanceof Permission)) {
+    public function assignPerm($p, $r)
+    {
+        if (!($p instanceof Permission)) {
             new Permission($p);//Check if permission exists. If it doesn't exception is thrown
         }
-        if($r instanceof Role){
-           $r = $r->getName();
+        if ($r instanceof Role) {
+            $r = $r->getName();
         }
         try {
-            Site::DB()->query("INSERT INTO roles_permissions (role, permission) VALUE ('".
-                Site::DB()->escape($r)."', '".Site::DB()->escape($p)."')");
-        }
-        catch(DBException $e){
-            if($e->getCode()!=1062){//Ignore Duplicate entries errors
+            Site::DB()->query("INSERT INTO roles_permissions (role, permission) VALUE ('" .
+              Site::DB()->escape($r) . "', '" . Site::DB()->escape($p) . "')");
+        } catch (DBException $e) {
+            if ($e->getCode() != 1062) {//Ignore Duplicate entries errors
                 throw $e;
             }
         }
@@ -59,48 +63,51 @@ class Auth{
      * @param string|Permission $p
      * @param string|Role $r
      */
-    public function deletePerm($p, $r){
-        if($r instanceof Role){
+    public function deletePerm($p, $r)
+    {
+        if ($r instanceof Role) {
             $r = $r->getName();
         }
-        if($p instanceof Permission){
+        if ($p instanceof Permission) {
             $p = $p->getName();
         }
 
-        Site::DB()->query("DELETE FROM roles_permissions WHERE role='".
-            Site::DB()->escape($r)."' AND permission='".Site::DB()->escape($p)."'");
+        Site::DB()->query("DELETE FROM roles_permissions WHERE role='" .
+          Site::DB()->escape($r) . "' AND permission='" . Site::DB()->escape($p) . "'");
     }
 
-    public function getRole($r){
+    public function getRole($r)
+    {
         return Role::findOne(['name' => $r]);
     }
 
-    public function addRole($r, $display=''){
-        Site::DB()->query("INSERT INTO role (`name`, display) VALUE ('".
-            Site::DB()->escape($r)."', '".Site::DB()->escape($display)."')");
+    public function addRole($r, $display = '')
+    {
+        Site::DB()->query("INSERT INTO role (`name`, display) VALUE ('" .
+          Site::DB()->escape($r) . "', '" . Site::DB()->escape($display) . "')");
     }
 
     /**
      * @param string|Role $r
      * @throws InternalServerError
      */
-    public function deleteRole($r){
-        if($r instanceof Role){
+    public function deleteRole($r)
+    {
+        if ($r instanceof Role) {
             $r = $r->getName();
         }
 
         try {
             Site::DB()->startTransaction();
-            Site::DB()->query("DELETE FROM roles_permissions WHERE role='".
-                Site::DB()->escape($r)."'");
-            Site::DB()->query("DELETE FROM role WHERE `name`='".
-                Site::DB()->escape($r)."'");
-            Site::DB()->query("DELETE FROM users_roles WHERE role='".
-                Site::DB()->escape($r)."'");
+            Site::DB()->query("DELETE FROM roles_permissions WHERE role='" .
+              Site::DB()->escape($r) . "'");
+            Site::DB()->query("DELETE FROM role WHERE `name`='" .
+              Site::DB()->escape($r) . "'");
+            Site::DB()->query("DELETE FROM users_roles WHERE role='" .
+              Site::DB()->escape($r) . "'");
 
             Site::DB()->commitTransaction();
-        }
-        catch (DBException $e){
+        } catch (DBException $e) {
             Site::DB()->rollbackTransaction();
             $e->logError("Cancellazione ruolo");
             throw new InternalServerError("Si è verificato un errore nella cancellazione del ruolo");
@@ -113,31 +120,31 @@ class Auth{
      * @param string|Permission $perm
      * @return bool
      */
-    public function roleCan($r, $perm){
-        if(!is_array($r)){
+    public function roleCan($r, $perm)
+    {
+        if (!is_array($r)) {
             $r = [$r];
         }
 
-        foreach($r as $k=>$v){
-            if(is_string($v)) {
+        foreach ($r as $k => $v) {
+            if (is_string($v)) {
                 $r[$k] = "'" . Site::DB()->escape($v) . "'";
-            }
-            elseif($v instanceof Role){
+            } elseif ($v instanceof Role) {
                 $r[$k] = "'" . Site::DB()->escape($v->getName()) . "'";
-            }
-            else{
+            } else {
                 unset($r[$k]);
             }
         }
 
-        if($perm instanceof Permission){
+        if ($perm instanceof Permission) {
             $perm = $perm->getName();
         }
 
-        $q = "SELECT COUNT(*) AS N FROM roles_permissions WHERE role IN (".implode(', ', $r).") AND permission='".
-            Site::DB()->escape($perm)."'";
+        $q = "SELECT COUNT(*) AS N FROM roles_permissions WHERE role IN (" . implode(', ', $r) . ") AND permission='" .
+          Site::DB()->escape($perm) . "'";
 
         $res = Site::DB()->query($q, true);
+
         return $res['N'] > 0;
     }
 
@@ -147,8 +154,10 @@ class Auth{
      * @param string|Permission $perm
      * @return bool
      */
-    public function userCan($uid, $perm){
+    public function userCan($uid, $perm)
+    {
         $roles = $this->getUserRoles($uid);
+
         return $this->roleCan($roles, $perm);
     }
 
@@ -157,7 +166,8 @@ class Auth{
      * @param string|Permission $perm
      * @return bool
      */
-    public function iCan($perm){
+    public function iCan($perm)
+    {
         return $this->userCan($this->getLoggedInUser(), $perm);
     }
 
@@ -166,16 +176,17 @@ class Auth{
      * @param string|AuthUserInterface $uid
      * @return Role[]
      */
-    public function getUserRoles($uid){
-        if(is_object($uid) && $uid instanceof AuthUserInterface){
+    public function getUserRoles($uid)
+    {
+        if (is_object($uid) && $uid instanceof AuthUserInterface) {
             $uid = $uid->getId();
         }
 
         return array_merge(Role::find([
-            'search_joins' => 'users',
-            'search_literal' => 1,
-            "users.user = '".Site::DB()->escape($uid)."'"
-        ]), $this->isLoggedIn()?[Role::getAuthenticatedUserRole()]:[Role::getAnonymousUserRole()]);
+          'search_joins' => 'users',
+          'search_literal' => 1,
+          "users.user = '" . Site::DB()->escape($uid) . "'"
+        ]), $this->isLoggedIn() ? [Role::getAuthenticatedUserRole()] : [Role::getAnonymousUserRole()]);
     }
 
     /**
@@ -184,11 +195,12 @@ class Auth{
      * @param bool $any in the case that $r is an array, tells if it should return true if ANY role matches or if ALL need to match
      * @return bool
      */
-    public function userHasRole($uid, $r, $any = true){
-        if(!is_array($r)){
+    public function userHasRole($uid, $r, $any = true)
+    {
+        if (!is_array($r)) {
             $r = [$r];
         }
-        if(is_object($uid) && $uid instanceof AuthUserInterface){
+        if (is_object($uid) && $uid instanceof AuthUserInterface) {
             $uid = $uid->getId();
         }
 
@@ -197,17 +209,15 @@ class Auth{
                 $value = $value->getName();
             }
             if ($value == Role::AUTHENTICATED_USER && $this->isLoggedIn()) {
-                if($any) {
+                if ($any) {
                     return true;
-                }
-                else{
+                } else {
                     continue;
                 }
             } elseif ($r == Role::ANONYMOUS_USER && !$this->isLoggedIn()) {
-                if($any){
+                if ($any) {
                     return true;
-                }
-                else{
+                } else {
                     continue;
                 }
             }
@@ -215,23 +225,21 @@ class Auth{
             $result = Site::DB()->query("SELECT COUNT(*) AS N FROM users_roles WHERE `user`='" . Site::DB()->escape($uid) .
               "' AND role='" . Site::DB()->escape($r) . "'", true);
 
-            if($result['N']>0) {
-                if ($any){
+            if ($result['N'] > 0) {
+                if ($any) {
                     return true;
-                }
-                else{
+                } else {
                     continue;
                 }
-            }
-            else {//If I get here, ALL checks were false
-                if(!$any) {
+            } else {//If I get here, ALL checks were false
+                if (!$any) {
                     return false;//As soon as I get a false I return with the ALL strategy
                 }
             }
         }
 
         //If we get here it means we didn't find any true in ANY strategy, or we didn't find any false in ALL strategy
-        return $any?false:true;
+        return $any ? false : true;
     }
 
     /**
@@ -239,21 +247,21 @@ class Auth{
      * @param Role|string $r
      * @throws DBException
      */
-    public function addUserRole($uid, $r){
-        if($r instanceof Role){
+    public function addUserRole($uid, $r)
+    {
+        if ($r instanceof Role) {
             $r = $r->getName();
         }
 
-        if(is_object($uid) && $uid instanceof AuthUserInterface){
+        if (is_object($uid) && $uid instanceof AuthUserInterface) {
             $uid = $uid->getId();
         }
 
         try {
             Site::DB()->query("INSERT INTO users_roles (`user`, role) VALUES ('" . Site::DB()->escape($uid) .
-                "','" . Site::DB()->escape($r) . "')");
-        }
-        catch(DBException $e){
-            if($e->getCode()!=1062){//Ignore Duplicate entries errors
+              "','" . Site::DB()->escape($r) . "')");
+        } catch (DBException $e) {
+            if ($e->getCode() != 1062) {//Ignore Duplicate entries errors
                 throw $e;
             }
         }
@@ -263,47 +271,53 @@ class Auth{
      * @param string|AuthUserInterface $uid
      * @param Role $r
      */
-    public function deleteUserRole($uid, $r){
-        if($r instanceof Role){
+    public function deleteUserRole($uid, $r)
+    {
+        if ($r instanceof Role) {
             $r = $r->getName();
         }
 
-        if(is_object($uid) && $uid instanceof AuthUserInterface){
+        if (is_object($uid) && $uid instanceof AuthUserInterface) {
             $uid = $uid->getId();
         }
 
-        Site::DB()->query("DELETE FROM users_roles WHERE `user`='".
-            Site::DB()->escape($uid)."' AND role='".Site::DB()->escape($r)."'");
+        Site::DB()->query("DELETE FROM users_roles WHERE `user`='" .
+          Site::DB()->escape($uid) . "' AND role='" . Site::DB()->escape($r) . "'");
     }
 
     /**
      * @param AuthUserInterface $user
      */
-    public function login($user){
-        $this->user=$user;
+    public function login($user)
+    {
+        $this->user = $user;
         $_SESSION['uid'] = $user->getId();
     }
 
-    public function logout(){
+    public function logout()
+    {
         $this->user = null;
         unset($_SESSION['uid']);
     }
 
-    public function isLoggedIn(){
-        if($this->user===null){
+    public function isLoggedIn()
+    {
+        if ($this->user === null) {
             $this->getLoggedInUser();
         }
 
-        return $this->user!==null;
+        return $this->user !== null;
     }
 
     /**
      * @return AuthUserInterface|null
      */
-    public function getLoggedInUser(){
-        if($this->user===null){
+    public function getLoggedInUser()
+    {
+        if ($this->user === null) {
             $this->user = $this->userClass->getMethod('getLoggedInUser')->invoke(null);
         }
+
         return $this->user;
     }
 }

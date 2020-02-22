@@ -1,7 +1,9 @@
 <?php
+
 namespace nigiri\themes;
 
-class FatalErrorTheme implements ThemeInterface{
+class FatalErrorTheme implements ThemeInterface
+{
     private $body = '';
 
     public function append($str, $part = 'body')
@@ -31,7 +33,7 @@ class FatalErrorTheme implements ThemeInterface{
 <title>Errore Fatale</title>
 </head>
 <body>
-'.$this->body.'
+' . $this->body . '
 </body>
 </html>';
     }

@@ -1,11 +1,13 @@
 <?php
+
 namespace nigiri\rbac;
 
 use nigiri\db\DbResult;
 use nigiri\models\Model;
 use nigiri\models\ModelException;
 
-class Role extends Model {
+class Role extends Model
+{
 
     const AUTHENTICATED_USER = '-1';
     const ANONYMOUS_USER = '-2';
@@ -41,11 +43,11 @@ class Role extends Model {
     protected static function getAttributesMap()
     {
         return [
-            'name' => 'name',
-            'internalname' => 'name',
-            'internal' => 'name',
-            'display_name' => 'display',
-            'display' => 'display'
+          'name' => 'name',
+          'internalname' => 'name',
+          'internal' => 'name',
+          'display_name' => 'display',
+          'display' => 'display'
         ];
     }
 
@@ -75,20 +77,20 @@ class Role extends Model {
     protected static function getJoinsMap()
     {
         return [
-            'permissions' => [
-                'type' => 'LEFT',
-                'assoc' => Model::JOIN_ONE_TO_MANY,
-                'model' => 'roles_permissions',
-                'my_field' => 'name',
-                'its_field' => 'role'
-            ],
-            'users' => [
-                'type' => 'LEFT',
-                'assoc' => Model::JOIN_ONE_TO_MANY,
-                'model' => 'users_roles',
-                'my_field' => 'name',
-                'its_field' => 'role'
-            ]
+          'permissions' => [
+            'type' => 'LEFT',
+            'assoc' => Model::JOIN_ONE_TO_MANY,
+            'model' => 'roles_permissions',
+            'my_field' => 'name',
+            'its_field' => 'role'
+          ],
+          'users' => [
+            'type' => 'LEFT',
+            'assoc' => Model::JOIN_ONE_TO_MANY,
+            'model' => 'users_roles',
+            'my_field' => 'name',
+            'its_field' => 'role'
+          ]
         ];
     }
 
@@ -122,6 +124,7 @@ class Role extends Model {
                 $out[] = new Role($auto_load, $row, true);
             }
         }
+
         return $out;
     }
 
@@ -150,15 +153,19 @@ class Role extends Model {
         throw new ModelException("ID ruolo mancante nei dati!");
     }
 
-    public static function getAuthenticatedUserRole(){
+    public static function getAuthenticatedUserRole()
+    {
         $r = new Role(false, ['name' => self::AUTHENTICATED_USER, 'display' => 'Utente Autenticato']);
         $r->setNoSave(true);
+
         return $r;
     }
 
-    public static function getAnonymousUserRole(){
+    public static function getAnonymousUserRole()
+    {
         $r = new Role(false, ['name' => self::ANONYMOUS_USER, 'display' => 'Utente Non Autenticato']);
         $r->setNoSave(true);
+
         return $r;
     }
 }
