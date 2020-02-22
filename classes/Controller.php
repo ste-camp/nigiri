@@ -76,9 +76,18 @@ abstract class Controller
     }
 
     /**
+     * Immediately redirects the browser to the specified Url (with no delay)
+     * @param stringg $toUrl the URL to redirect the browser to
+     */
+    static public function redirectTo($toUrl){
+        header("Location:" . $toUrl);
+    }
+
+    /**
      * Executes an action of the controller and performs all the necessary operations before and after it
      * @param $action
      * @return string
+     * @throws \ReflectionException
      */
     public function executeAction($action)
     {
