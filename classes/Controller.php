@@ -46,10 +46,14 @@ abstract class Controller
      * @return string the generated HTML code
      * @throws FileNotFound
      */
-    static public function renderView($path, $args = [])
+    static public function renderView($path = '', $args = [])
     {
         $def_lan = Site::getParam('default_language');
         $current_lan = Site::getRouter()->getRequestedLanguage();
+
+        if(empty($path)){
+            $path = Site::getRouter()->getControllerUrlComponent() . '/' . Site::getRouter()->getActionUrlComponent();
+        }
 
         $try = [
             //View in a folder for the current language
