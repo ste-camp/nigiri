@@ -59,7 +59,7 @@ class LayoutTheme extends Theme
     public function render()
     {
         $data = new LayoutData();
-        $data->site_name = Site::getParam('site_name');
+        $data->site_name = Site::getParam(NIGIRI_PARAM_SITE_NAME);
         $data->language = Site::getRouter()->getRequestedLanguage();
         $data->title = $this->title;
         $data->head = $this->head;

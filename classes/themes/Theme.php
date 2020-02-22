@@ -30,7 +30,7 @@ class Theme implements ThemeInterface
 
     public function render()
     {
-        $this->title .= (empty($this->title) ? '' : ' - ') . Site::getParam('site_name');
+        $this->title .= (empty($this->title) ? '' : ' - ') . Site::getParam(NIGIRI_PARAM_SITE_NAME);
 
         $ready = '';
         if (!empty($this->script_on_ready)) {

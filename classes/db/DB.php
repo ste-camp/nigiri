@@ -40,7 +40,7 @@ abstract class DB
      */
     public function query($sql, $oneshot = false, $mode = DB::RESULT_ASSOC)
     {
-        if (Site::getParam('debug')) {
+        if (Site::getParam(NIGIRI_PARAM_DEBUG)) {
             self::$requestsLog[] = array($sql);
         }
 

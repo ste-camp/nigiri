@@ -80,9 +80,9 @@ class Exception extends \Exception
 
     public function logToWebmasterEmail()
     {
-        $email = Site::getParam("technical_email");
+        $email = Site::getParam(NIGIRI_PARAM_TECH_EMAIL);
         if (empty($email)) {
-            $email = Site::getParam("email");
+            $email = Site::getParam(NIGIRI_PARAM_EMAIL);
             if (empty($email)) {
                 $email = 'webmaster';
             }
@@ -90,7 +90,7 @@ class Exception extends \Exception
 
         try {
             $m = new Email();
-            @$m->addRecipients($email)->send(Site::getParam('site_name') . ': Errore Fatale!',
+            @$m->addRecipients($email)->send(Site::getParam(NIGIRI_PARAM_SITE_NAME) . ': Errore Fatale!',
               $this->renderEmailText());
         } catch (Exception $e) {
             //Nothing we are already dealing with an error
@@ -146,7 +146,7 @@ class Exception extends \Exception
     public function getThemeClass()
     {
         $className = get_called_class();
-        $overrides = Site::getParam('exceptions_views', []);
+        $overrides = Site::getParam(NIGIRI_PARAM_EXCEPTIONS_VIEWS, []);
 
         if (array_key_exists($className, $overrides)) {
             return $overrides[$className];

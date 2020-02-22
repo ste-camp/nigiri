@@ -48,7 +48,7 @@ abstract class Controller
      */
     static public function renderView($path = '', $args = [])
     {
-        $def_lan = Site::getParam('default_language');
+        $def_lan = Site::getParam(NIGIRI_PARAM_DEFAULT_LANGUAGE);
         $current_lan = Site::getRouter()->getRequestedLanguage();
 
         if(empty($path)){

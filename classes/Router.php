@@ -22,19 +22,19 @@ class Router
         if (!empty($_GET['show_page'])) {
             $this->pageUrl = $_GET['show_page'];
         } else {
-            $this->pageUrl = Site::getParam('default_page');
+            $this->pageUrl = Site::getParam(NIGIRI_PARAM_DEFAULT_PAGE);
         }
 
         $boom = array_filter(explode('/', $this->pageUrl));
 
-        $lang = Site::getParam("languages", []);
+        $lang = Site::getParam(NIGIRI_PARAM_SUPPORTED_LANGUAGES, []);
         if (in_array($boom[0], $lang)) {
             $this->language = array_shift($boom);
             if (empty($boom)) {//Home page with a language specified
-                $boom = array_filter(explode('/', Site::getParam('default_page')));
+                $boom = array_filter(explode('/', Site::getParam(NIGIRI_PARAM_DEFAULT_PAGE)));
             }
         } else {
-            $this->language = Site::getParam('default_language');
+            $this->language = Site::getParam(NIGIRI_PARAM_DEFAULT_LANGUAGE);
         }
 
         if (count($boom) == 1) {
@@ -142,7 +142,7 @@ class Router
         }
 
         $boom = explode('/', $page);
-        $lang = Site::getParam("languages", []);
+        $lang = Site::getParam(NIGIRI_PARAM_SUPPORTED_LANGUAGES, []);
         if (in_array($boom[0], $lang)) {
             array_shift($boom);
         }
@@ -154,5 +154,7 @@ class Router
             return $boom[0] == Controller::camelCaseToUnderscore(substr($this->controller, 0,
                 -10)) && Controller::camelCaseToUnderscore($this->action) == 'index';
         }
+
+        return false;
     }
 }

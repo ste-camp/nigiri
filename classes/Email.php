@@ -46,29 +46,29 @@ class Email
 
         try {
             //Invio con SMTP
-            if (Site::getParam('email_smtp', false)) {
+            if (Site::getParam(NIGIRI_PARAM_EMAIL_SMTP, false)) {
                 $this->mail->IsSMTP();
-                $this->mail->Host = Site::getParam('email_smtp_host', '');
-                $this->mail->Port = Site::getParam('email_smtp_port', '25');
-                $user = Site::getParam('email_smtp_user', '');
+                $this->mail->Host = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_HOST, '');
+                $this->mail->Port = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_PORT, '25');
+                $user = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_USER, '');
                 if (!empty($user)) {
                     $this->mail->SMTPAuth = true;
                     $this->mail->Username = $user;
-                    $this->mail->Password = Site::getParam('email_smtp_psw', '');
+                    $this->mail->Password = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_PASSWORD, '');
                 }
-                if (Site::getParam('email_smtp_secure') == 1) {
+                if (Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_SECURE) == 1) {
                     $this->mail->SMTPSecure = "ssl";
                 }
             }
 
             if (empty($from) || empty($from['addr'])) {
-                $this->mail->SetFrom(Site::getParam('email'), Site::getParam('site_name'), true);
+                $this->mail->SetFrom(Site::getParam(NIGIRI_PARAM_EMAIL), Site::getParam(NIGIRI_PARAM_SITE_NAME), true);
             } else {
                 if (!isset($from['name'])) {
                     $from['name'] = '';
                 }
                 $this->mail->SetFrom($from['addr'], $from['name'], true);
-                $this->mail->Sender = Site::getParam('email');
+                $this->mail->Sender = Site::getParam(NIGIRI_PARAM_EMAIL);
             }
 
             if ($html) {
@@ -192,7 +192,7 @@ class Email
           '/@year\b/s'
         ];
         $values = [
-          Site::getParam('site_name'),
+          Site::getParam(NIGIRI_PARAM_SITE_NAME),
           Url::to('/', [], true),
           date('Y')
         ];

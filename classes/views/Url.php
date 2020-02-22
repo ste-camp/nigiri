@@ -26,7 +26,7 @@ class Url
 
             if (!empty($language)) {
                 $boom = explode('/', $url);
-                $lang = Site::getParam("languages", []);
+                $lang = Site::getParam(NIGIRI_PARAM_SUPPORTED_LANGUAGES, []);
                 if (in_array($boom[0], $lang)) {//If the first argument is a language code
                     array_shift($boom);
                     $url = $language . '/' . implode('/', $boom);
@@ -37,7 +37,7 @@ class Url
         } else {
             $url = $l_page;
 
-            $avail_lang = Site::getParam("languages", []);
+            $avail_lang = Site::getParam(NIGIRI_PARAM_SUPPORTED_LANGUAGES, []);
             if (count($avail_lang) > 1) {
                 $language = empty($language) ? Site::getRouter()->getRequestedLanguage() : $language;
             } else {//No need to specify a language if this is not really a multilanguage site
@@ -59,7 +59,7 @@ class Url
             }
         }
 
-        if (!Site::getParam('clean_urls')) {
+        if (!Site::getParam(NIGIRI_PARAM_CLEAN_URL)) {
             $url = 'index.php?show_page=' . $url;
         }
 
@@ -125,8 +125,8 @@ class Url
             $url = substr($url, 1);
         }
 
-        if (Site::getParam('url_prefix') != '') {
-            $pre = Site::getParam('url_prefix');
+        if (Site::getParam(NIGIRI_PARAM_URL_PREFIX) != '') {
+            $pre = Site::getParam(NIGIRI_PARAM_URL_PREFIX);
             if ($pre[0] != '/') {
                 $pre = '/' . $pre;
             }

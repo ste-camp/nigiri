@@ -12,11 +12,11 @@ use nigiri\views\Html;
 <h2>Si &egrave; verificato un errore grave che impedisce la corretta esecuzione del Sito Web.</h2>
 <h3>Ci scusiamo per il disagio, il nostro staff &egrave; stato notificato e il problema sar&agrave; presto risolto.</h3>
 <p>Se avete necessit&agrave; di contattare lo staff potete farlo inviando un email a: <a
-      href="mailto:<?= Site::getParam('email') ?>"><?= Html::escape(Site::getParam('email'))?></a></p>
+      href="mailto:<?= Site::getParam(NIGIRI_PARAM_EMAIL) ?>"><?= Html::escape(Site::getParam(NIGIRI_PARAM_EMAIL))?></a></p>
 <p>Dettaglio dell&#039;errore: <?= (($exception!=null and $exception instanceof Exception and $exception->getMessage())?
     Html::escape($exception->getMessage()):'Nessuno')?></p>
 <?php
-if(Site::getParam('debug') and $exception!=null){
+if(Site::getParam(NIGIRI_PARAM_DEBUG) and $exception!=null){
     if($exception instanceof Exception) {
         echo '<table><tr><th colspan="2">Exception</th></tr>
     <tr><td>Nome</td><td>' . get_class($exception) . '</td></tr>

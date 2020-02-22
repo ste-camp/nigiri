@@ -78,11 +78,11 @@ class Site
             self::$auth = new Auth(empty($data['authUserClass']) ? '' : $data['authUserClass']);
         }
 
-        if (self::getParam('debug')) {
+        if (self::getParam(NIGIRI_PARAM_DEBUG)) {
             ini_set('display_errors', true);
         }
 
-        $locale = self::getParam('locales', []);
+        $locale = self::getParam(NIGIRI_PARAM_LOCALES, []);
         if (array_key_exists(self::getRouter()->getRequestedLanguage(), $locale)) {
             call_user_func_array('setlocale',
               array_merge([LC_ALL], $locale[self::getRouter()->getRequestedLanguage()]));
@@ -99,7 +99,7 @@ class Site
             }
         }
 
-        date_default_timezone_set(self::getParam('timezone', ''));
+        date_default_timezone_set(self::getParam(NIGIRI_PARAM_TIMEZONE, ''));
     }
 
     /**
@@ -117,6 +117,7 @@ class Site
 
     /**
      * @return ThemeInterface
+     * @throws Exception
      */
     public static function getTheme()
     {
@@ -164,8 +165,26 @@ class Site
      */
     public static function getParam($name, $default = null)
     {
-        if (key_exists($name, self::$params)) {
-            return self::$params[$name];
+        return self::getParamRecursive($name, self::$params, $default);
+    }
+
+    /**
+     * Gets the name of the website as configured in the static settings
+     * @return mixed|null
+     */
+    public static function getSiteName(){
+        return self::getParam(NIGIRI_PARAM_SITE_NAME, '');
+    }
+
+    private static function getParamRecursive($name, $params, $default = null)
+    {
+        if (key_exists($name, $params)) {
+            return $params[$name];
+        } elseif (strpos($name, '.') !== false) {//Array Access
+            $paramBoom = explode('.', $name);
+            if (key_exists($paramBoom[0], $params) and is_array($params[$paramBoom[0]])) {
+                return self::getParamRecursive(substr($name, strlen($paramBoom[0])), $params[$paramBoom[0]], $default);
+            }
         }
 
         return $default;

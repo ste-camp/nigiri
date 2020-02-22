@@ -6,6 +6,7 @@ ini_set('display_errors', false);
 ini_set('log_errors', true);
 ini_set('error_log', __DIR__.'/nigiri_error.log');
 
+require_once __DIR__.'/includes/defines.php';
 require_once __DIR__.'/classes/class_loader.php';
 require_once __DIR__.'/includes/functions.php';
 
