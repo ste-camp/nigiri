@@ -10,20 +10,22 @@ use nigiri\exceptions\InternalServerError;
  */
 class Router
 {
-    private $page;
+    private $pageUrl;
+    private $controllerUrlComponent;
     private $controller;
+    private $actionUrlComponent;
     private $action;
     private $language;
 
     public function __construct()
     {
         if (!empty($_GET['show_page'])) {
-            $this->page = $_GET['show_page'];
+            $this->pageUrl = $_GET['show_page'];
         } else {
-            $this->page = Site::getParam('default_page');
+            $this->pageUrl = Site::getParam('default_page');
         }
 
-        $boom = array_filter(explode('/', $this->page));
+        $boom = array_filter(explode('/', $this->pageUrl));
 
         $lang = Site::getParam("languages", []);
         if (in_array($boom[0], $lang)) {
@@ -40,13 +42,16 @@ class Router
         }
 
         if (count($boom) == 2) {
-            $this->controller = Controller::underscoreToCamelCase($boom[0]) . 'Controller';
-            $this->action = Controller::underscoreToCamelCase(empty($boom[1]) ? 'index' : $boom[1], false);
+            $this->controllerUrlComponent = $boom[0];
+            $this->controller = Controller::underscoreToCamelCase($this->controllerUrlComponent) . 'Controller';
+
+            $this->actionUrlComponent = empty($boom[1]) ? 'index' : $boom[1];
+            $this->action = Controller::underscoreToCamelCase($this->actionUrlComponent, false);
         } else {
-            if (empty($this->page)) {
+            if (empty($this->pageUrl)) {
                 throw new InternalServerError("Nessuna home page è stata definita");
             } else {
-                new FileNotFound("", 'Impossibile trovare ' . $this->page);
+                new FileNotFound("", 'Impossibile trovare ' . $this->pageUrl);
             }
         }
     }
@@ -87,19 +92,37 @@ class Router
         throw new FileNotFound();
     }
 
-    public function getPage()
+    public function getPageUrl()
     {
-        return $this->page;
+        return $this->pageUrl;
     }
 
+    /**
+     * Get the name of the requested controller class
+     * @return string
+     */
     public function getControllerName()
     {
         return $this->controller;
     }
 
+    public function getControllerUrlComponent()
+    {
+        return $this->controllerUrlComponent;
+    }
+
+    /**
+     * Get the name of the requested action (without the eventual "action" prefix)
+     * @return string
+     */
     public function getActionName()
     {
         return $this->action;
+    }
+
+    public function getActionUrlComponent()
+    {
+        return $this->actionUrlComponent;
     }
 
     public function getRequestedLanguage()
@@ -114,7 +137,7 @@ class Router
      */
     public function isCurrentPage($page)
     {
-        if ($page == $this->page) {
+        if ($page == $this->pageUrl) {
             return true;
         }
 

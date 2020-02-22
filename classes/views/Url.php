@@ -22,7 +22,7 @@ class Url
     public static function to($l_page = '', $query = '', $absolute = false, $language = '')
     {
         if (empty($l_page)) {
-            $url = Site::getRouter()->getPage();
+            $url = Site::getRouter()->getPageUrl();
 
             if (!empty($language)) {
                 $boom = explode('/', $url);
