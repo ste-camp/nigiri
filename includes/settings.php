@@ -39,7 +39,11 @@ return [
         NIGIRI_PARAM_EMAIL_SMTP => false,
 
         NIGIRI_PARAM_EMAIL_SMTP_CONFIG => [
-
+          'host' => '',
+            'port' => 25,
+            'user' => '',
+            'psw' => '',
+            'secure' => 1
         ],
 
         NIGIRI_PARAM_DEBUG => true,
