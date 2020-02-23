@@ -37,6 +37,7 @@ abstract class InputValidator
 
     /**
      * @param InputValidator[] $items
+     * @return array an array with all the errors that were found
      */
     public static function validateAll($items)
     {
@@ -48,6 +49,8 @@ abstract class InputValidator
                 $errors[$i->inputName] = $tmp;
             }
         }
+
+        return $errors;
     }
 
     /**
