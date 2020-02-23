@@ -19,11 +19,15 @@ class NumericInputValidator extends InputValidator
     const NUMBER_FLOAT = 0x4;
 
     private $mask;
+    private $min;
+    private $max;
 
-    public function __construct($name, $desc, $from, $validation_mask = 0x0)
+    public function __construct($name, $desc, $from, $validation_mask = 0x0, $minValue = null, $maxValue = null)
     {
         parent::__construct($name, $desc, $from);
         $this->mask = $validation_mask;
+        $this->min = $minValue;
+        $this->max = $maxValue;
     }
 
     /**
@@ -44,12 +48,19 @@ class NumericInputValidator extends InputValidator
             $castVal = (float) $val;
         }
 
-        if($this->mask & self::NUMBER_POSITIVE != 0x0 && $castVal < 0) {
+        if($this->mask & self::NUMBER_POSITIVE != 0x0 and $castVal < 0) {
             return l("%s must be positive", $this->description);
         }
 
-        if($this->mask & self::NUMBER_NEGATIVE != 0x0 && $castVal >= 0) {
+        if($this->mask & self::NUMBER_NEGATIVE != 0x0 and $castVal >= 0) {
             return l("%s must be negative", $this->description);
+        }
+
+        if($this->min !== null and $castVal < $this->min) {
+            return l("%s must be higher than %d", $this->description, $this->min);
+        }
+        if($this->max !== null and $castVal > $this->max) {
+            return l("%s must be lower than %d", $this->description, $this->max);
         }
 
         $this->setValue($castVal);
