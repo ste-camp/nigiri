@@ -3,41 +3,113 @@
 
 namespace nigiri\utilities;
 
+use nigiri\exceptions\ArgumentNotFoundException;
+use nigiri\exceptions\BadArgumentException;
+
 /**
  * Class to validate variables and values coming from GET and POST requests
  * @package nigiri\utilities
  */
-class InputValidator
+abstract class InputValidator
 {
-    private $config;
+    //Request type from where this input is accepted
+    const FROM_GET = "GET";
+    const FROM_POST = "POST";
+    const FROM_COOKIE = "COOKIE";
+    const FROM_ANY = "ANY";
 
-    const RULE_NOT_EMPTY = 1;
-    const RULE_NUMERIC = 2;
+    protected $inputName;
+    protected $description;
+    protected $from;
 
-    public function __construct($conf)
+    /**
+     * InputValidator constructor.
+     * @param string $name name of the input to check
+     * @param string $desc Name of the parameter to be displayed
+     * @param string $from where to find the input: GET, POST, COOKIE or ANY (for checking in the $_REQUEST array)
+     */
+    public function __construct($name, $desc, $from)
     {
-        $this->config = $conf;
+        $this->inputName = $name;
+        $this->description = $desc;
+        $this->from = $from;
     }
 
-    public function validate(){
+    /**
+     * @param InputValidator[] $items
+     */
+    public static function validateAll($items)
+    {
         $errors = [];
 
-        foreach($this->config as $field => $c){
-            switch($c['rule']){
-                case self::RULE_NOT_EMPTY:
-                    $this->validateNotEmpty($field, $c);
-                    break;
-                case self::RULE_NUMERIC:
-                    $this->validateNumeric($field, $c);
+        foreach ($items as $i) {
+            $tmp = $i->validate();
+            if($tmp !== true) {
+                $errors[$i->inputName] = $tmp;
             }
         }
     }
 
-    private function validateNotEmpty($field, $config){
-        //todo
+    /**
+     * @return string|bool
+     */
+    public abstract function validate();
+
+    /**
+     * Gets the value of the input from its superglobal.
+     *
+     * @return mixed
+     * @throws ArgumentNotFoundException
+     * @throws BadArgumentException
+     */
+    protected function getValue() {
+        $superg = null;
+        switch (strtoupper($this->from)) {
+            case self::FROM_ANY:
+                $superg = &$_REQUEST;
+                break;
+            case self::FROM_GET:
+                $superg = &$_GET;
+                break;
+            case self::FROM_POST:
+                $superg = &$_POST;
+                break;
+            case self::FROM_COOKIE:
+                $superg = &$_COOKIE;
+                break;
+            default:
+                throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $this->from);
+        }
+
+        if(array_key_exists($this->inputName, $superg)) {
+            return $superg[$this->inputName];
+        }
+        throw new ArgumentNotFoundException();
     }
 
-    private function validateNumeric($field, $config){
-        //todo
+    /**
+     * @param $val
+     * @throws BadArgumentException
+     */
+    protected function setValue($val) {
+        $superg = null;
+        switch (strtoupper($this->from)) {
+            case self::FROM_ANY:
+                $superg = &$_REQUEST;
+                break;
+            case self::FROM_GET:
+                $superg = &$_GET;
+                break;
+            case self::FROM_POST:
+                $superg = &$_POST;
+                break;
+            case self::FROM_COOKIE:
+                $superg = &$_COOKIE;
+                break;
+            default:
+                throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $this->from);
+        }
+
+        $superg[$this->inputName] = $val;
     }
 }
