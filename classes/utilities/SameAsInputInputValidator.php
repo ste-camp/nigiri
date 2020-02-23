@@ -16,13 +16,14 @@ class SameAsInputInputValidator extends InputValidator
      * @param $desc
      * @param $from
      * @param $otherInput
+     * @param $otherFrom
      * @param $otherDescr
      */
-    public function __construct($name, $desc, $from, $otherInput, $otherDescr)
+    public function __construct($name, $desc, $from, $otherInput, $otherFrom, $otherDescr)
     {
         parent::__construct($name, $desc, $from);
         $this->other = $otherInput;
-        $this->otherFrom = $from;
+        $this->otherFrom = $otherFrom;
         $this->otherDesc = $otherDescr;
     }
 
