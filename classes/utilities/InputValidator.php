@@ -44,9 +44,14 @@ abstract class InputValidator
         $errors = [];
 
         foreach ($items as $i) {
-            $tmp = $i->validate();
-            if($tmp !== true) {
-                $errors[$i->inputName] = $tmp;
+            try {
+                $tmp = $i->validate();
+                if ($tmp !== true) {
+                    $errors[$i->inputName] = $tmp;
+                }
+            }
+            catch(ArgumentNotFoundException $e){
+                //If input is not found just jump the check, we assume that if you really want to check that the input exists you use NotEmptyInputValidator
             }
         }
 
