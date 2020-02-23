@@ -64,15 +64,27 @@ abstract class InputValidator
     public abstract function validate();
 
     /**
-     * Gets the value of the input from its superglobal.
-     *
+     * Gets the value of the input from its superglobal
      * @return mixed
      * @throws ArgumentNotFoundException
      * @throws BadArgumentException
      */
     protected function getValue() {
+        return $this->getValueOfInput($this->from, $this->inputName);
+    }
+
+    /**
+     * Gets the value an input from a superglobal
+     *
+     * @param $from
+     * @param $inputName
+     * @return mixed
+     * @throws ArgumentNotFoundException
+     * @throws BadArgumentException
+     */
+    protected function getValueOfInput($from, $inputName) {
         $superg = null;
-        switch (strtoupper($this->from)) {
+        switch (strtoupper($from)) {
             case self::FROM_ANY:
                 $superg = &$_REQUEST;
                 break;
@@ -86,11 +98,11 @@ abstract class InputValidator
                 $superg = &$_COOKIE;
                 break;
             default:
-                throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $this->from);
+                throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $from);
         }
 
-        if(array_key_exists($this->inputName, $superg)) {
-            return $superg[$this->inputName];
+        if(array_key_exists($inputName, $superg)) {
+            return $superg[$inputName];
         }
         throw new ArgumentNotFoundException();
     }
