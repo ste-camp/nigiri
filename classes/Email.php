@@ -85,7 +85,9 @@ class Email
             foreach($search_paths as $path){
                 if (file_exists($path)) {
                     $message = page_include($path,
-                      array_merge(['email' => $this->mail], !empty($data['php_data']) ? $data['php_data'] : array()));
+                      array_merge(
+                        ['email' => $this->mail, 'site_name' => Site::getSiteName(), 'site_url' => Url::to('/', '', true)],
+                        !empty($data['php_data']) ? $data['php_data'] : array()));
                     break;
                 }
             }
