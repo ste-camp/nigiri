@@ -77,12 +77,17 @@ class Email
 
             $this->mail->Subject = $subject;
 
-            if (file_exists(dirname(__DIR__) . '/email/' . $message)) {
-                $message = page_include(dirname(__DIR__) . '/email/' . $message,
-                  array_merge(['email' => $this->mail], !empty($data['php_data']) ? $data['php_data'] : array()));
-            } elseif (file_exists($message)) {
-                $message = page_include($message,
-                  array_merge(['email' => $this->mail], !empty($data['php_data']) ? $data['php_data'] : array()));
+            $search_paths = [
+                dirname(__DIR__) . '/email/' . $message . '.php',
+                dirname(__DIR__) . '/email/' . $message,
+                $message
+            ];
+            foreach($search_paths as $path){
+                if (file_exists($path)) {
+                    $message = page_include($path,
+                      array_merge(['email' => $this->mail], !empty($data['php_data']) ? $data['php_data'] : array()));
+                    break;
+                }
             }
 
             if ($html && empty($data['no_layout'])) {
