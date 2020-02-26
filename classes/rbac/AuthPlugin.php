@@ -81,12 +81,12 @@ class AuthPlugin implements PluginInterface
                         break;
                     }
                 } elseif ($temp instanceof Permission) {
-                    if (Site::getAuth()->iCan($p)) {
+                    if (Site::getAuth()->iCan($temp)) {
                         $match = true;
                         break;
                     }
                 } elseif ($temp instanceof Role) {
-                    if (Site::getAuth()->userHasRole(Site::getAuth()->getLoggedInUser(), $p)) {
+                    if (Site::getAuth()->userHasRole(Site::getAuth()->getLoggedInUser(), $temp)) {
                         $match = true;
                         break;
                     }
@@ -113,17 +113,17 @@ class AuthPlugin implements PluginInterface
 
                 $out = [];
                 foreach ($p as $temp) {
-                    if (is_string($temp)) {
+                    if (is_int($temp) and $temp == Role::AUTHENTICATED_USER) {
+                        $out[] = Role::AUTHENTICATED_USER;
+                    } elseif (is_string($temp)) {
                         try {
-                            $out[] = new Permission($p);
+                            $out[] = new Permission($temp);
                         } catch (Exception $e) {//It's not a valid permission name
-                            $r = Site::getAuth()->getRole($p);
+                            $r = Site::getAuth()->getRole($temp);
                             if (!empty($r)) {
                                 $out[] = $r;
                             }
                         }
-                    } elseif (is_int($temp) && $p == Role::AUTHENTICATED_USER) {
-                        $out[] = Role::AUTHENTICATED_USER;
                     }
                 }
 
