@@ -93,6 +93,7 @@ abstract class Controller
     {
         /** @var PluginInterface[] $plugins */
         $plugins = [];
+        $return = null;
 
         //Setup Plugins and execute beforeAction()
         foreach ($this->plugins() as $plugin) {
@@ -104,17 +105,20 @@ abstract class Controller
                     $p = $refl->newInstance($plugin);
                     $plugins[] = $p;
 
-                    $p->beforeAction($action);
+                    $return = $p->beforeAction($action);
                 }
             }
         }
 
-        //Execute actual Action
-        $output = $this->$action();
+        $output = '';
+        if($return !== false) {
+            //Execute actual Action
+            $output = $this->$action();
 
-        //Execute afterAction() on the output
-        foreach ($plugins as $plugin) {
-            $output = $plugin->afterAction($action, $output);
+            //Execute afterAction() on the output
+            foreach ($plugins as $plugin) {
+                $output = $plugin->afterAction($action, $output);
+            }
         }
 
         return $output;
