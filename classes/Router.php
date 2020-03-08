@@ -17,6 +17,11 @@ class Router
     private $action;
     private $language;
 
+    /**
+     * Router constructor.
+     * @throws FileNotFound
+     * @throws InternalServerError
+     */
     public function __construct()
     {
         if (!empty($_GET['show_page'])) {
@@ -51,7 +56,7 @@ class Router
             if (empty($this->pageUrl)) {
                 throw new InternalServerError("Nessuna home page è stata definita");
             } else {
-                new FileNotFound("", 'Impossibile trovare ' . $this->pageUrl);
+                throw new FileNotFound("", 'Impossibile trovare ' . $this->pageUrl);
             }
         }
     }
