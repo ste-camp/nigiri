@@ -58,12 +58,16 @@ abstract class Controller
         $try = [
             //View in a folder for the current language
           dirname(__DIR__) . '/views/' . $current_lan . '/' . $path . '.php',
+            dirname(__DIR__) . '/views/'.$current_lan . '/' . Site::getRouter()->getControllerUrlComponent() . '/' . $path . '.php',
             //View in a folder for the default language
           dirname(__DIR__) . '/views/' . $def_lan . '/' . $path . '.php',
+          dirname(__DIR__) . '/views/' . $def_lan . '/' . Site::getRouter()->getControllerUrlComponent() . '/' . $path . '.php',
             //View in a folder with no language
           dirname(__DIR__) . '/views/' . $path . '.php',
+          dirname(__DIR__) . '/views/' . Site::getRouter()->getControllerUrlComponent() . '/' . $path . '.php',
             //Exact location of the view is specified in $path
-          $path . '.php'
+          $path . '.php',
+          $path
         ];
 
         foreach ($try as $t) {
