@@ -85,6 +85,10 @@ class Url
         }
 
         $action = Controller::camelCaseToUnderscore($action);
+        if($action == 'index') {
+            $action = '';
+        }
+
         $controller[0] = strtolower($controller[0]);
         if (strrpos($controller, "Controller") === strlen($controller) - 10) {//if it ends with "Controller"
             $controller = substr($controller, 0, -10);
