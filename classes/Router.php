@@ -70,31 +70,40 @@ class Router
      */
     public function routeRequest()
     {
-        ob_start();//Just a security measure to ensure accidental echos in the controllers don't break the theme output
-        if (class_exists('site\\controllers\\' . $this->controller)) {
-            $class = new \ReflectionClass('site\\controllers\\' . $this->controller);
-            if ($class->isSubclassOf('nigiri\Controller')) {
-                /** @var Controller $instance */
-                $instance = $class->newInstance();
-
-                $action = null;
-                if ($class->hasMethod($this->action)) {
-                    $action = $this->action;
-                } elseif ($class->hasMethod('action' . ucfirst($this->action))) {
-                    $action = 'action' . ucfirst($this->action);
-                }
-
-                //Enable the controller to have its own default theme
-                $controller_theme = $instance->getDefaultControllerThemeConfig($action);
-                if ($controller_theme != null) {
-                    Site::switchThemeByConfig($controller_theme);
-                }
-
-                return $instance->executeAction($action);
-            }
+        if (!class_exists('site\\controllers\\' . $this->controller)) {
+            throw new FileNotFound();
         }
+
+        ob_start();//Just a security measure to ensure accidental echos in the controllers don't break the theme output
+
+        $class = new \ReflectionClass('site\\controllers\\' . $this->controller);
+        if (!$class->isSubclassOf('nigiri\Controller')) {
+            throw new FileNotFound();
+        }
+
+        /** @var Controller $instance */
+        $instance = $class->newInstance();
+
+        $action = null;
+        if ($class->hasMethod($this->action)) {
+            $action = $this->action;
+        } elseif ($class->hasMethod('action' . ucfirst($this->action))) {
+            $action = 'action' . ucfirst($this->action);
+        }
+        else{
+            throw new FileNotFound();
+        }
+
+        //Enable the controller to have its own default theme
+        $controller_theme = $instance->getDefaultControllerThemeConfig($action);
+        if ($controller_theme != null) {
+            Site::switchThemeByConfig($controller_theme);
+        }
+
+        $out = $instance->executeAction($action);
         ob_end_clean();
-        throw new FileNotFound();
+
+        return $out;
     }
 
     public function getPageUrl()
