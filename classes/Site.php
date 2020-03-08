@@ -59,7 +59,7 @@ class Site
         } else {
             self::themeClassCheck($data['default_theme']);
 
-            self::$themeConfig = $data['theme'];
+            self::$themeConfig = $data['default_theme'];
         }
 
         if (!empty($data['db'])) {
