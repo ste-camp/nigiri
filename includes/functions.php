@@ -135,7 +135,7 @@ function render_fatal_error($exception = null)
 
     if (!empty($boom[0])) {
         $class = new ReflectionClass($boom[0]);
-        if ($class->implementsInterface('nigiri\\themes\\ThemeInterface')) {
+        if ($class->isSubclassOf('nigiri\\themes\\ThemeInterface')) {
             Site::switchTheme($class->newInstance());
         } else {
             Site::getTheme()->resetPart('body');

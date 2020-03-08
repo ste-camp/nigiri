@@ -99,7 +99,7 @@ abstract class Controller
         foreach ($this->plugins() as $plugin) {
             if (!empty($plugin['class']) and class_exists($plugin['class'])) {
                 $refl = new \ReflectionClass($plugin['class']);
-                if ($refl->implementsInterface('nigiri\\plugins\\PluginInterface')) {
+                if ($refl->isSubclassOf('nigiri\\plugins\\PluginInterface')) {
                     unset($plugin['class']);
                     /** @var PluginInterface $p */
                     $p = $refl->newInstance($plugin);

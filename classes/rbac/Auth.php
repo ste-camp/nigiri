@@ -22,7 +22,7 @@ class Auth
     {
         try {
             $c = new \ReflectionClass($userClass);
-            if ($c->implementsInterface('nigiri\\rbac\\AuthUserInterface')) {
+            if ($c->isSubclassOf('nigiri\\rbac\\AuthUserInterface')) {
                 $this->userClass = $c;
             } else {
                 throw new InternalServerError("Configurazione errata",

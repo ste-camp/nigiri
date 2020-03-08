@@ -258,7 +258,7 @@ class Site
     {
         try {
             $themeClass = new \ReflectionClass($config['class']);
-            if (!$themeClass->implementsInterface("\\nigiri\\themes\\ThemeInterface")) {
+            if (!$themeClass->isSubclassOf("\\nigiri\\themes\\ThemeInterface")) {
                 throw new Exception("Errore configurazione tema per visualizzare il sito", 2,
                   "Il tema specificato non implementa l'interfaccia ThemeInterface");
             }
