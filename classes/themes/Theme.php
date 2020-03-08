@@ -8,6 +8,12 @@ use nigiri\views\Url;
 
 class Theme implements ThemeInterface
 {
+    const PART_TITLE = 'title';
+    const PART_HEAD = 'head';
+    const PART_SCRIPT = 'script';
+    const PART_SCRIPT_ON_READY = 'script_on_ready';
+    const PART_BODY = 'body';
+
     protected $title = '';
     protected $head = '';
     protected $script = '';
