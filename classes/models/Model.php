@@ -922,6 +922,12 @@ abstract class Model
                                 $w = self::normalizeAttribute($name, 'write', '0');
                                 $fields[] = $w[0] . " " . $operatore;
                                 break;
+                            case 'BETWEEN':
+                                $w1 = self::normalizeAttribute($name, 'write', $value[0]);
+                                $w2 = self::normalizeAttribute($name, 'write', $value[1]);
+
+                                $fields[] = $w1[0] . " BETWEEN " . $w1[1] . "AND " . $w2[1];
+                                break;
                             default:
                                 $temp_v = array();
                                 foreach ($value as $s_value) {
@@ -945,7 +951,7 @@ abstract class Model
 
     private static function isValidSqlOperator($op)
     {
-        static $operators = array('=', '!=', '<>', 'IN', '<', '<=', '>', '>=', 'NOT IN', 'IS NULL', 'IS NOT NULL');
+        static $operators = array('=', '!=', '<>', 'IN', '<', '<=', '>', '>=', 'NOT IN', 'IS NULL', 'IS NOT NULL', 'BETWEEN');
 
         return in_array(trim(strtoupper($op)), $operators);
     }
