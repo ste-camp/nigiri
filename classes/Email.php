@@ -56,9 +56,7 @@ class Email
                     $this->mail->Username = $user;
                     $this->mail->Password = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_PASSWORD, '');
                 }
-                if (Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_SECURE) == 1) {
-                    $this->mail->SMTPSecure = "ssl";
-                }
+                $this->mail->SMTPSecure = Site::getParam(NIGIRI_PARAM_EMAIL_SMTP_SECURE);
             }
 
             if (empty($from) || empty($from['addr'])) {

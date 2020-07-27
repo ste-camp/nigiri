@@ -17,5 +17,8 @@ define('NIGIRI_PARAM_EMAIL_SMTP_PORT', 'email_smtp_config.port');
 define('NIGIRI_PARAM_EMAIL_SMTP_USER', 'email_smtp_config.user');
 define('NIGIRI_PARAM_EMAIL_SMTP_PASSWORD', 'email_smtp_config.psw');
 define('NIGIRI_PARAM_EMAIL_SMTP_SECURE', 'email_smtp_config.secure');
+define('NIGIRI_EMAIL_SECURE_SSL', 'ssl');
+define('NIGIRI_EMAIL_SECURE_TLS', 'tls');
+define('NIGIRI_EMAIL_SECURE_AUTO', '');
 define('NIGIRI_PARAM_DEBUG', 'debug');
 define('NIGIRI_PARAM_EXCEPTIONS_VIEWS', 'exceptions_views');
