@@ -31,8 +31,8 @@ class NotEmptyInputValidator extends InputValidator
     public function validate()
     {
         try {
-            $this->getValue();
-            return true;
+            $v = $this->getValue();
+            return !empty($v);
         } catch (ArgumentNotFoundException $e) {
             if ($this->defaultValue != self::DEFAULT_EMPTY) {//Value not found, but we can set a default value for it
                 $this->setValue($this->defaultValue);
