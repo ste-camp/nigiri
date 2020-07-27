@@ -183,7 +183,7 @@ class Site
         } elseif (strpos($name, '.') !== false) {//Array Access
             $paramBoom = explode('.', $name);
             if (key_exists($paramBoom[0], $params) and is_array($params[$paramBoom[0]])) {
-                return self::getParamRecursive(substr($name, strlen($paramBoom[0])), $params[$paramBoom[0]], $default);
+                return self::getParamRecursive(substr($name, strlen($paramBoom[0]) + 1), $params[$paramBoom[0]], $default);
             }
         }
 
