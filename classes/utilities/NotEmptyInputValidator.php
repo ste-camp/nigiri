@@ -32,7 +32,7 @@ class NotEmptyInputValidator extends InputValidator
     {
         try {
             $v = $this->getValue();
-            return !empty($v);
+            return empty($v) ? l("%s cannot be empty", $this->description) : true;
         } catch (ArgumentNotFoundException $e) {
             if ($this->defaultValue != self::DEFAULT_EMPTY) {//Value not found, but we can set a default value for it
                 $this->setValue($this->defaultValue);
