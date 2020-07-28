@@ -774,7 +774,7 @@ abstract class Model
      */
     public static function find($search = array())
     {
-        $joins = '';
+        $joins = [];
         $order_by = '';
         $limit = '';
         $select_what = 'THIS.*';
@@ -852,7 +852,7 @@ abstract class Model
             unset($search['search_order']);
         }
         $where = self::queryParseConditions($search);
-        $query = "SELECT " . $select_what . " FROM " . static::getTableName() . ' AS THIS ' . $joins . (!empty($where) ? " WHERE "
+        $query = "SELECT " . $select_what . " FROM " . static::getTableName() . ' AS THIS ' . (empty($joins)?'':$joins) . (!empty($where) ? " WHERE "
             . $where : '') . $order_by . $limit;
         $obj = Site::DB()->query($query);
 
