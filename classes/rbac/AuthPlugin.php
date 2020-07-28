@@ -75,7 +75,7 @@ class AuthPlugin implements PluginInterface
         } elseif (is_array($p)) {
             $match = false;
             foreach ($p as $temp) {
-                if (is_int($temp) && $temp == Role::AUTHENTICATED_USER) {
+                if ($temp === Role::AUTHENTICATED_USER) {
                     if (Site::getAuth()->isLoggedIn()) {
                         $match = true;
                         break;
@@ -113,7 +113,7 @@ class AuthPlugin implements PluginInterface
 
                 $out = [];
                 foreach ($p as $temp) {
-                    if (is_int($temp) and $temp == Role::AUTHENTICATED_USER) {
+                    if ($temp === Role::AUTHENTICATED_USER) {
                         $out[] = Role::AUTHENTICATED_USER;
                     } elseif (is_string($temp)) {
                         try {
