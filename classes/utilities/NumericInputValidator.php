@@ -44,15 +44,15 @@ class NumericInputValidator extends InputValidator
         }
 
         $castVal = (int)$val;
-        if($this->mask & self::NUMBER_FLOAT != 0x0) {
+        if(($this->mask & self::NUMBER_FLOAT) != 0x0) {
             $castVal = (float) $val;
         }
 
-        if($this->mask & self::NUMBER_POSITIVE != 0x0 and $castVal < 0) {
+        if(($this->mask & self::NUMBER_POSITIVE) != 0x0 and $castVal < 0) {
             return l("%s must be positive", $this->description);
         }
 
-        if($this->mask & self::NUMBER_NEGATIVE != 0x0 and $castVal >= 0) {
+        if(($this->mask & self::NUMBER_NEGATIVE) != 0x0 and $castVal >= 0) {
             return l("%s must be negative", $this->description);
         }
 
