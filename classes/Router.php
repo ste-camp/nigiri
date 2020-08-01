@@ -85,12 +85,19 @@ class Router
         $instance = $class->newInstance();
 
         $action = null;
+        $m = null;
         if ($class->hasMethod($this->action)) {
-            $action = $this->action;
+            $m = $class->getMethod($this->action);
         } elseif ($class->hasMethod('action' . ucfirst($this->action))) {
-            $action = 'action' . ucfirst($this->action);
+            $this->action = 'action' . ucfirst($this->action);
+            $m = $class->getMethod($this->action);
         }
-        else{
+
+        if($m != null && $m->isPublic()){
+            $action = $this->action;
+        }
+
+        if(empty($action)) {
             throw new FileNotFound();
         }
 
