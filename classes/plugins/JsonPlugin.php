@@ -6,6 +6,7 @@ use nigiri\Controller;
 
 class JsonPlugin implements PluginInterface
 {
+    public const CONFIG_ALL_PAGES = '*';
 
     private $config = [];
 
@@ -20,9 +21,9 @@ class JsonPlugin implements PluginInterface
 
     public function afterAction($actionName, $actionOutput)
     {
-        $action = Controller::camelCaseToUnderscore($actionName);
+        $underscore_action = Controller::camelCaseToUnderscore($actionName);
 
-        if (in_array($action, $this->config) or in_array('*', $this->config)) {
+        if (in_array($actionName, $this->config) or in_array($underscore_action, $this->config) or in_array(self::CONFIG_ALL_PAGES, $this->config)) {
             header('Content-Type: application/json; charset=utf-8');
 
             return json_encode($actionOutput);
