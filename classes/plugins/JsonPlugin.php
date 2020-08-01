@@ -6,7 +6,7 @@ use nigiri\Controller;
 
 class JsonPlugin implements PluginInterface
 {
-    public const CONFIG_ALL_PAGES = '*';
+    const CONFIG_ALL_PAGES = '*';
 
     private $config = [];
 
