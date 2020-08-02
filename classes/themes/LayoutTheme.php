@@ -10,7 +10,7 @@ use nigiri\views\LayoutData;
 
 class LayoutTheme extends Theme
 {
-    private $layoutPath;
+    protected $layoutPath;
 
     /**
      * LayoutTheme constructor.
@@ -50,13 +50,21 @@ class LayoutTheme extends Theme
             }
 
             if (empty($this->layoutPath)) {//No file found :(
-                throw new InternalServerError("Errore nel tema",
-                  "Il layout per il tema non è stato trovato nei percorsi automatici");
+                throw new InternalServerError(l("Theme Error"),
+                  l("The layout file for the theme was not found in the automatic paths"));
             }
         }
     }
 
     public function render()
+    {
+        echo page_include($this->layoutPath, ['layoutData' => $this->setupLayoutData()]);
+    }
+
+    /**
+     * @return LayoutData
+     */
+    protected function setupLayoutData()
     {
         $data = new LayoutData();
         $data->site_name = Site::getParam(NIGIRI_PARAM_SITE_NAME);
@@ -67,7 +75,6 @@ class LayoutTheme extends Theme
         $data->script = $this->script;
         $data->script_on_ready = $this->script_on_ready;
 
-        echo page_include($this->layoutPath, ['layoutData' => $data]);
+        return $data;
     }
-
 }
