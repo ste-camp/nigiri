@@ -10,7 +10,7 @@ class BadRequest extends HttpException
 {
     public function __construct($str = "", $detail = "")
     {
-        $this->theme = ':' . dirname(__DIR__) . '/views/http404.php';
+        $this->theme = ':' . dirname(__DIR__) . '/views/http400.php';
 
         if (empty($str)) {
             $str = 'I dati inviati sono incorretti';
