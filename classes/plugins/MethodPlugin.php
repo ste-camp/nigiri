@@ -23,8 +23,8 @@ class MethodPlugin implements PluginInterface
         }
         $action = Controller::camelCaseToUnderscore($action);
 
-        if (array_key_exists($action, $this->config)) {
-            $methods = $this->config[$action];
+        if (array_key_exists($action, $this->config) || array_key_exists($actionName, $this->config)) {
+            $methods = array_key_exists($action, $this->config) ? $this->config[$action] : $this->config[$actionName];
             if (!is_array($methods)) {
                 $methods = [$methods];
             }
@@ -37,7 +37,7 @@ class MethodPlugin implements PluginInterface
             }
 
             if (!$found) {
-                throw new BadRequest("Questa pagina non è accessibile con una richiesta " . strtoupper($_SERVER['REQUEST_METHOD']));
+                throw new BadRequest(l("This page is not accessible with a %s request", strtoupper($_SERVER['REQUEST_METHOD'])));
             }
         }
     }
