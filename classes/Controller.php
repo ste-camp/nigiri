@@ -110,6 +110,9 @@ abstract class Controller
                     $plugins[] = $p;
 
                     $return = $p->beforeAction($action);
+                    if($return === false){//plugin returning false stops page and plugins processing
+                        break;
+                    }
                 }
             }
         }
