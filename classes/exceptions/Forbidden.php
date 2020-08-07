@@ -10,6 +10,8 @@ class Forbidden extends HttpException
 {
     public function __construct($str = "", $detail = "")
     {
+        $this->theme = ':' . dirname(__DIR__) . '/views/http403.php';
+
         if (empty($str)) {
             $str = 'Non hai i permessi per accedere a questa pagina';
         }
