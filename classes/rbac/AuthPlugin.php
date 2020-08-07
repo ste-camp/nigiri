@@ -7,6 +7,7 @@ use nigiri\exceptions\Exception;
 use nigiri\exceptions\Forbidden;
 use nigiri\plugins\PluginInterface;
 use nigiri\Site;
+use nigiri\views\Url;
 
 class AuthPlugin implements PluginInterface
 {
@@ -69,13 +70,16 @@ class AuthPlugin implements PluginInterface
     private function applyPolicy($p, $isAllow = true)
     {
         if ($p == self::ALLOW) {
-            return;
+            return true;
         } elseif ($p == self::DENY) {
             throw new Forbidden();
         } elseif (is_array($p)) {
+            $needs_login = false;
+
             $match = false;
             foreach ($p as $temp) {
                 if ($temp === Role::AUTHENTICATED_USER) {
+                    $needs_login = true;
                     if (Site::getAuth()->isLoggedIn()) {
                         $match = true;
                         break;
@@ -94,10 +98,16 @@ class AuthPlugin implements PluginInterface
             }
 
             if (($match && $isAllow) || (!$match && !$isAllow)) {
-                return;
+                return true;
             }
 
-            throw new Forbidden();
+            if($needs_login){//If the page is not allow because authentication is required don't throw an error but redirect to login page
+                Controller::redirectTo(Url::to(Site::getParam(NIGIRI_PARAM_LOGIN_URL), ['login_needed' => 1]));
+                return false;
+            }
+            else {//If it's really not allowed here, throw real error
+                throw new Forbidden();
+            }
         }
     }
 

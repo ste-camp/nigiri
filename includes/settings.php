@@ -22,6 +22,8 @@ return [
         /** the home page, the one to show if there is no page requested */
         NIGIRI_PARAM_DEFAULT_PAGE => 'site/home',
 
+        NIGIRI_PARAM_LOGIN_URL => 'site/home',
+
         /** An array of enabled languages in the website */
         NIGIRI_PARAM_SUPPORTED_LANGUAGES => ['it'],
 

@@ -10,6 +10,7 @@ define('NIGIRI_PARAM_SUPPORTED_LANGUAGES', 'languages');
 define('NIGIRI_PARAM_DEFAULT_LANGUAGE', 'default_language');
 define('NIGIRI_PARAM_LOCALES', 'locales');
 define('NIGIRI_PARAM_TIMEZONE', 'timezone');
+define('NIGIRI_PARAM_LOGIN_URL', 'login_url');
 define('NIGIRI_PARAM_EMAIL_SMTP', 'email_smtp');
 define('NIGIRI_PARAM_EMAIL_SMTP_CONFIG', 'email_smtp_config');
 define('NIGIRI_PARAM_EMAIL_SMTP_HOST', 'email_smtp_config.host');
