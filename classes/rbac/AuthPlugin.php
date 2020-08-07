@@ -53,7 +53,7 @@ class AuthPlugin implements PluginInterface
             }
         }
 
-        $this->applyPolicy($policy, $allow);
+        return $this->applyPolicy($policy, $allow);
     }
 
     public function afterAction($actionName, $actionOutput)
