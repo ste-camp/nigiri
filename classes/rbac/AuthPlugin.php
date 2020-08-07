@@ -7,6 +7,7 @@ use nigiri\exceptions\Exception;
 use nigiri\exceptions\Forbidden;
 use nigiri\plugins\PluginInterface;
 use nigiri\Site;
+use nigiri\themes\LayoutTheme;
 use nigiri\views\Url;
 
 class AuthPlugin implements PluginInterface
@@ -103,6 +104,7 @@ class AuthPlugin implements PluginInterface
 
             if($needs_login){//If the page is not allow because authentication is required don't throw an error but redirect to login page
                 Controller::redirectTo(Url::to(Site::getParam(NIGIRI_PARAM_LOGIN_URL), ['login_needed' => 1]));
+                Site::switchTheme(new LayoutTheme());//back to standard theme, just to avoid rendering any strange layout which may require data we skipped initializing
                 return false;
             }
             else {//If it's really not allowed here, throw real error
