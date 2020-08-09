@@ -149,7 +149,39 @@ class Exception extends \Exception
         $overrides = Site::getParam(NIGIRI_PARAM_EXCEPTIONS_VIEWS, []);
 
         if (array_key_exists($className, $overrides)) {
-            return $overrides[$className];
+            if(is_array($overrides[$className])){
+                $themeName = '';
+                try{
+                    $theme = Site::getTheme();
+                    $themeName = get_class($theme);
+                }
+                catch(Exception $e){//Exception may have been thrown on theme init, let's avoid it
+                }
+
+                $default = '';
+                $match = '';
+                foreach($overrides[$className] as $override){
+                    if($override[0] == ':') {//If it starts with a semicolon there is no theme class specified, so it's the "any theme" entry that matches everything
+                        $default = $override;
+                    }
+                    elseif(strpos($override, $themeName) === 0 and (strlen($override) == strlen($themeName) or $override[strlen($themeName)] == ':')) {//if override starts with current theme name then it's the rule to apply
+                        $match = $override;
+                    }
+                }
+
+                if(empty($match) && empty($default)) {
+                    return $this->theme;
+                }
+                elseif(!empty($match)) {
+                    return $match;
+                }
+                else {
+                    return $default;
+                }
+            }
+            else {
+                return $overrides[$className];
+            }
         }
 
         return $this->theme;
