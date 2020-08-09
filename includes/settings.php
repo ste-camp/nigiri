@@ -51,7 +51,7 @@ return [
         NIGIRI_PARAM_DEBUG => true,
 
         /** Defines views to be used to render each type of Exception.
-         * Keys of the array must be Exception names (with full namespace) values must be in the format "ThemeClass:ViewFileName */
+         * Keys of the array must be Exception names (with full namespace) values must follow the format for Exception::$theme */
         NIGIRI_PARAM_EXCEPTIONS_VIEWS => []
     ]
 ];

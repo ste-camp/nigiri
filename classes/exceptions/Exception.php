@@ -9,12 +9,19 @@ use nigiri\views\Html;
 
 class Exception extends \Exception
 {
+    const DEFAULT_THEME_KEY = 'default';
+
     /**
-     * @var string the name of the class to use to render the error when it reaches the uncaught exception handler
-     * You can also specify a View by appending its path after a colon (:)
-     * It must implement \nigiri\themes\ThemeInterface
+     * @var array|string an array of names of classes and views to use to render the error when it reaches the uncaught exception handler
+     * Each entry represents the view to use if the specified theme is the current one.
+     * If the current theme is not in the list then the entry with key self::DEFAULT_THEME_KEY is used
+     * You can also specify a View by appending its path after the theme with a colon prefix (:)
+     * Theme must implement \nigiri\themes\ThemeInterface
      */
-    protected $theme = 'nigiri\\themes\\FatalErrorTheme';
+    protected $theme = [
+        self::DEFAULT_THEME_KEY => 'nigiri\\themes\\FatalErrorTheme',
+        'nigiri\\themes\\AjaxTheme:ajax_exception'
+    ];
 
     private $internal;
 
@@ -150,40 +157,47 @@ class Exception extends \Exception
 
         if (array_key_exists($className, $overrides)) {
             if(is_array($overrides[$className])){
-                $themeName = '';
-                try{
-                    $theme = Site::getTheme();
-                    $themeName = get_class($theme);
-                }
-                catch(Exception $e){//Exception may have been thrown on theme init, let's avoid it
-                }
-
-                $default = '';
-                $match = '';
-                foreach($overrides[$className] as $override){
-                    if($override[0] == ':') {//If it starts with a semicolon there is no theme class specified, so it's the "any theme" entry that matches everything
-                        $default = $override;
-                    }
-                    elseif(strpos($override, $themeName) === 0 and (strlen($override) == strlen($themeName) or $override[strlen($themeName)] == ':')) {//if override starts with current theme name then it's the rule to apply
-                        $match = $override;
-                    }
-                }
-
-                if(empty($match) && empty($default)) {
-                    return $this->theme;
-                }
-                elseif(!empty($match)) {
-                    return $match;
-                }
-                else {
-                    return $default;
-                }
+                return $this->getActiveThemeOverride($className, $overrides[$className]);
             }
             else {
                 return $overrides[$className];
             }
         }
+        else {
+            if(is_array($this->theme)){
+                return $this->getActiveThemeOverride($className, $this->theme);
+            }
+            else {
+                return $this->theme;
+            }
+        }
+    }
 
-        return $this->theme;
+    private function getActiveThemeOverride($className, $overrides){
+        $themeName = '';
+        try{
+            $theme = Site::getTheme();
+            $themeName = get_class($theme);
+        }
+        catch(Exception $e){//Exception may have been thrown on theme init, let's avoid it
+        }
+
+        $default = array_key_exists(self::DEFAULT_THEME_KEY, $overrides) ? $overrides[self::DEFAULT_THEME_KEY]: '';
+        $match = '';
+        foreach($overrides[$className] as $override){
+            if(strpos($override, $themeName) === 0 and (strlen($override) == strlen($themeName) or $override[strlen($themeName)] == ':')) {//if override starts with current theme name then it's the rule to apply
+                $match = $override;
+            }
+        }
+
+        if(empty($match) && empty($default)) {
+            return is_array($this->theme) ? null : $this->theme;
+        }
+        elseif(!empty($match)) {
+            return $match;
+        }
+        else {
+            return $default;
+        }
     }
 }
