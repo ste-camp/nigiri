@@ -19,6 +19,12 @@ class JsonPlugin implements PluginInterface
 
     public function beforeAction($actionName)
     {
+        $underscore_action = Controller::camelCaseToUnderscore($actionName);
+
+        if (in_array($actionName, $this->config) or in_array($underscore_action, $this->config) or in_array(self::CONFIG_ALL_PAGES, $this->config)) {
+            Site::switchTheme(new AjaxTheme());
+            header('Content-Type: application/json; charset=utf-8');
+        }
     }
 
     public function afterAction($actionName, $actionOutput)
@@ -26,9 +32,6 @@ class JsonPlugin implements PluginInterface
         $underscore_action = Controller::camelCaseToUnderscore($actionName);
 
         if (in_array($actionName, $this->config) or in_array($underscore_action, $this->config) or in_array(self::CONFIG_ALL_PAGES, $this->config)) {
-            Site::switchTheme(new AjaxTheme());
-            header('Content-Type: application/json; charset=utf-8');
-
             return json_encode($actionOutput);
         } else {
             return $actionOutput;
