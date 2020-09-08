@@ -5,6 +5,9 @@ return [
       'class' => '\nigiri\themes\Theme',
       'config' => []
     ],
+    'permanent_plugins' => [
+
+    ],
     'params' => [
         /** Website's Email address, used as sender of the emails and webmaster's contact */
         NIGIRI_PARAM_EMAIL => '',

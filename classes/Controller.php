@@ -90,17 +90,18 @@ abstract class Controller
     /**
      * Executes an action of the controller and performs all the necessary operations before and after it
      * @param $action
+     * @param $permanent_plugins
      * @return string
      * @throws \ReflectionException
      */
-    public function executeAction($action)
+    public function executeAction($action, $permanent_plugins)
     {
         /** @var PluginInterface[] $plugins */
         $plugins = [];
         $return = null;
 
         //Setup Plugins and execute beforeAction()
-        foreach ($this->plugins() as $plugin) {
+        foreach (array_merge($permanent_plugins, $this->plugins()) as $plugin) {
             if (!empty($plugin['class']) and class_exists($plugin['class'])) {
                 $refl = new \ReflectionClass($plugin['class']);
                 if ($refl->isSubclassOf('nigiri\\plugins\\PluginInterface')) {

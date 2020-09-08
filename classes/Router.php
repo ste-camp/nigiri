@@ -17,13 +17,22 @@ class Router
     private $action;
     private $language;
 
+    private $permanent_plugins = [];
+
     /**
      * Router constructor.
      * @throws FileNotFound
      * @throws InternalServerError
      */
-    public function __construct()
+    public function __construct($permanent_plugins = [])
     {
+        if(is_array($permanent_plugins)) {
+            $this->permanent_plugins = $permanent_plugins;
+        }
+        else{
+            $this->permanent_plugins = [$permanent_plugins];
+        }
+
         if (!empty($_GET['show_page'])) {
             $this->pageUrl = $_GET['show_page'];
         } else {
@@ -107,7 +116,7 @@ class Router
             Site::switchThemeByConfig($controller_theme);
         }
 
-        $out = $instance->executeAction($action);
+        $out = $instance->executeAction($action, $this->permanent_plugins);
         ob_end_clean();
 
         return $out;

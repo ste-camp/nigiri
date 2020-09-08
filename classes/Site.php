@@ -72,7 +72,7 @@ class Site
 
         self::autoloadSetup($data['autoloader'], empty($data['autoload_paths']) ? [] : $data['autoload_paths']);
 
-        self::$router = new Router();
+        self::$router = new Router(empty($data['permanent_plugins']) ? [] : $data['permanent_plugins']);
 
         if (!empty($data['enableAuth'])) {
             self::$auth = new Auth(empty($data['authUserClass']) ? '' : $data['authUserClass']);
