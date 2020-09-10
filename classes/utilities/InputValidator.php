@@ -101,9 +101,26 @@ abstract class InputValidator
                 throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $from);
         }
 
-        if(array_key_exists($inputName, $superg)) {
-            return $superg[$inputName];
-        }
+        do {
+            if (array_key_exists($inputName, $superg)) {
+                return $superg[$inputName];
+            } else {
+                if (strpos($inputName, '.') !== false) {
+                    $boom = explode('.', $inputName);
+                    if (array_key_exists($boom[0], $superg)) {
+                        $val = $superg[$boom[0]];
+                        if(!is_array($val)){
+                            break;
+                        }
+                        else{
+                            $superg = &$superg[$boom[0]];
+                            $inputName = substr($inputName, strlen($boom[0]) +1);
+                        }
+                    }
+                }
+            }
+        } while(!empty($inputName));
+
         throw new ArgumentNotFoundException();
     }
 
@@ -130,6 +147,26 @@ abstract class InputValidator
                 throw new BadArgumentException(l("Bad validation configuration"), 0, "Unknown input source: " . $this->from);
         }
 
-        $superg[$this->inputName] = $val;
+        $origSuperG = &$superg;
+        $input = $this->inputName;
+        do {
+            if (array_key_exists($input, $superg)) {
+                $superg[$input] = $val;
+                return;
+            } elseif (strpos($input, '.') !== false) {
+                $boom = explode('.', $input);
+                if(!array_key_exists($boom[0], $superg) || !is_array($superg[$boom[0]])) {
+                    $origSuperG[$this->inputName] = $val;
+                    return;
+                }
+                else{
+                    $superg = &$superg[$boom[0]];
+                    $input = substr($input, strlen($boom[0]) +1);
+                }
+            } else {//make new value
+                $superg[$input] = $val;
+                return;
+            }
+        } while(!empty($input));
     }
 }
