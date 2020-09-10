@@ -31,7 +31,7 @@ class ExactMatchInputValidator extends InputValidator
         $val = $this->getValue();
 
         if($val != $this->match){
-            return l("%s must be ugual to %s", $this->description, $this->match);
+            return l("%s must be equal to %s", $this->description, $this->match);
         }
 
         return true;
