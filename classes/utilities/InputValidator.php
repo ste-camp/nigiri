@@ -117,6 +117,12 @@ abstract class InputValidator
                             $inputName = substr($inputName, strlen($boom[0]) +1);
                         }
                     }
+                    else{
+                        break;
+                    }
+                }
+                else{
+                    break;
                 }
             }
         } while(!empty($inputName));
