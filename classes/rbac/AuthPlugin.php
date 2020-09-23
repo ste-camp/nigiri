@@ -46,6 +46,10 @@ class AuthPlugin implements PluginInterface
                     $raw_p = $rule;
                     break;
                 }
+                elseif (in_array($actionName, $rule['actions'])) {
+                    $raw_p = $rule;
+                    break;
+                }
             }
 
             if (!empty($raw_p)) {
