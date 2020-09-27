@@ -932,7 +932,7 @@ abstract class Model
                                 $temp_v = array();
                                 foreach ($value as $s_value) {
                                     $w = self::normalizeAttribute($name, 'write', $s_value);
-                                    $temp_v[] = $w[0] . $operatore . $w[1];
+                                    $temp_v[] = $w[0] . " " . $operatore . " " . $w[1];
                                 }
                                 $fields[] = '(' . implode(' OR ', $temp_v) . ')';
                         }
@@ -951,7 +951,7 @@ abstract class Model
 
     private static function isValidSqlOperator($op)
     {
-        static $operators = array('=', '!=', '<>', 'IN', '<', '<=', '>', '>=', 'NOT IN', 'IS NULL', 'IS NOT NULL', 'BETWEEN');
+        static $operators = array('=', '!=', '<>', 'IN', '<', '<=', '>', '>=', 'NOT IN', 'IS NULL', 'IS NOT NULL', 'BETWEEN', 'LIKE');
 
         return in_array(trim(strtoupper($op)), $operators);
     }
