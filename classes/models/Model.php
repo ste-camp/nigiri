@@ -1119,13 +1119,13 @@ abstract class Model
             if (isset($joins[$name])) {
                 $j = $joins[$name];
                 if (!empty($j['model'])) {
-                    $join_table = self::getJoinTableData($orig_name, $j, $options);
+                    $join_table = self::getJoinTableData($name, $j, $options);
                     $my_id = static::getIdName();
 
                     $where = self::normalizeAttribute($my_id, 'write', $this->getAttribute($my_id));
                     $q = Site::DB()->query("SELECT " . $join_table['select'] . " FROM " . $this->getTableName() . " AS THIS "
-                      . self::buildJoinClause($orig_name) . " WHERE THIS." . $where[0] . "=" . $where[1] .
-                      (empty($j['condition']) ? ' AND ' . $orig_name . '.`' . $j['its_field'] . '` IS NOT NULL' : '') .
+                      . self::buildJoinClause($name) . " WHERE THIS." . $where[0] . "=" . $where[1] .
+                      (empty($j['condition']) ? ' AND ' . $name . '.`' . $j['its_field'] . '` IS NOT NULL' : '') .
                       (!empty($join_table['orderby']) ? ' ORDER BY ' . $join_table['orderby'] : ''));
                     //IS NOT NULL condition is needed to avoid returning one record with LEFT/RIGHT joins when there are no records joined (it would return one record with all fields to NULL)
 
