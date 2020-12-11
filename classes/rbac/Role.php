@@ -5,6 +5,7 @@ namespace nigiri\rbac;
 use nigiri\db\DbResult;
 use nigiri\models\Model;
 use nigiri\models\ModelException;
+use site\models\Character;
 
 class Role extends Model
 {
@@ -42,13 +43,37 @@ class Role extends Model
      */
     protected static function getAttributesMap()
     {
+        $extra = [
+          'name' => 'ExtraInfo',
+          'on_get' => function ($name, $value, Role $that) {
+              return !empty($value) ? json_decode($value, true) : [];
+          },
+          'write' => function($fieldName, $value) {
+              return "'".json_encode($value)."'";
+          }
+        ];
+
         return [
           'name' => 'name',
           'internalname' => 'name',
           'internal' => 'name',
           'display_name' => 'display',
-          'display' => 'display'
+          'display' => 'display',
+          'extrainfo' => $extra
         ];
+    }
+
+    /**
+     * Sets the value of an extra information for the current role
+     * @param $key
+     * @param $value
+     * @throws ModelException
+     */
+    public function setExtraInfoElement($key, $value){
+        $e = $this->getAttribute('extrainfo');
+        $e[$key] = $value;
+
+        $this->setAttribute('extrainfo', $e);
     }
 
     /**
