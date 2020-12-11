@@ -63,6 +63,11 @@ class Role extends Model
         ];
     }
 
+    public function getExtraInfoElement($key){
+        $e = $this->getAttribute('extrainfo');
+        return array_key_exists($key, $e) ? $e[$key] : null;
+    }
+
     /**
      * Sets the value of an extra information for the current role
      * @param $key
