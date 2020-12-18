@@ -57,7 +57,7 @@ class Role extends Model
           'name' => 'name',
           'internalname' => 'name',
           'internal' => 'name',
-          'display_name' => 'display',
+          'displayname' => 'display',
           'display' => 'display',
           'extrainfo' => $extra
         ];
