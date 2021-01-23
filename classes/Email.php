@@ -32,7 +32,7 @@ class Email
      * @param array $data : i dati da sostituire nel testo dell'email, le chiavi dell'array saranno richiamabili nel testo come @chiave. I dati nella chiave php_data vengono invece passati come variabili php se $message è un file
      * @param array $from : opzionale. un array con le informazioni del mittente nelle chiavi 'name' e 'addr'
      * @param array $header : opzionale. header addizionali da inviare. Il nome passato come chiave nell'array, il valore nel valore
-     * @return True se l'invio è andato a buon fine. False altrimenti
+     * @return bool true se l'invio è andato a buon fine. False altrimenti
      */
     public function send(
       $subject,
@@ -112,12 +112,12 @@ class Email
 
             $ret = $this->mail->Send();
             if (!$ret) {
-                Exception::watchdog("Errore invio email (send method): " . $this->mail->ErrorInfo);
+                (new Exception("Errore invio email", 0, "send method: " . $this->mail->ErrorInfo))->logErrorToDb();
 
                 return false;
             }
         } catch (\phpmailerException $e) {
-            Exception::watchdog("Errore invio email (eccezione): " . $e->errorMessage()); //Pretty error messages from PHPMailer
+            (new Exception("Errore invio email", 0, "eccezione", $e))->logErrorToDb();
 
             return false;
         }

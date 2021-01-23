@@ -621,7 +621,7 @@ abstract class Model
             }
             throw new ModelException("Il campo non può essere vuoto", 2);
         } catch (DBException $e) {
-            $e->logError("Errore loadAttribute di " . get_called_class() . ":");
+            $e->logErrorToDb("Errore loadAttribute di " . get_called_class() . ":");
             throw new ModelException("Non è stato possibile recuperare le informazioni sul campo", 3);
         }
     }
@@ -1218,7 +1218,7 @@ abstract class Model
 
                         return true;
                     } catch (DBException $e) {
-                        $e->logError("Errore set_attribute:");
+                        $e->logErrorToDb("Errore set_attribute:");
 
                         return false;
                     }
@@ -1264,7 +1264,7 @@ abstract class Model
 
             return true;
         } catch (DBException $e) {
-            $e->logError("Errore aggiornamento oggetto " . get_class($this));
+            $e->logErrorToDb("Errore aggiornamento oggetto " . get_class($this));
 
             return false;
         }

@@ -5,6 +5,7 @@ return [
       'class' => '\nigiri\themes\Theme',
       'config' => []
     ],
+    'exception_db_writer' => null,
     'permanent_plugins' => [
 
     ],

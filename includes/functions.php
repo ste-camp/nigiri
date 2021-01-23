@@ -103,7 +103,7 @@ function uncaught_exception_handler($e)
         }
 
         try {//if possibile log to db
-            $e->logError('Catch di emergenza', true);
+            $e->logErrorToDb('Catch di emergenza', true);
         } catch (DBException $ex) {//if db is unavailable, log to email
             $e->logToWebmasterEmail();
         }

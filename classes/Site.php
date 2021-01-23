@@ -4,6 +4,7 @@ namespace nigiri;
 
 use nigiri\db\DB;
 use nigiri\exceptions\Exception;
+use nigiri\exceptions\ExceptionDbWriter;
 use nigiri\rbac\Auth;
 use nigiri\themes\ThemeInterface;
 
@@ -51,6 +52,10 @@ class Site
     {
         if (empty($data['disableSession'])) {
             session_start();
+        }
+
+        if(!empty($data['exception_db_writer']) and $data['exception_db_writer'] instanceof ExceptionDbWriter){
+            Exception::setDbWriter($data['exception_db_writer']);
         }
 
         if (empty($data['default_theme'])) {

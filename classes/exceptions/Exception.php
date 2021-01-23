@@ -4,6 +4,7 @@ namespace nigiri\exceptions;
 
 use nigiri\db\DBException;
 use nigiri\Email;
+use nigiri\rbac\AuthUserInterface;
 use nigiri\Site;
 use nigiri\views\Html;
 
@@ -25,10 +26,17 @@ class Exception extends \Exception
 
     private $internal;
 
-    public function __construct($str = null, $no = null, $detail = null)
+    /** @var \Exception */
+    private $inner;
+
+    /** @var ExceptionDbWriter */
+    static private $dbWriter;
+
+    public function __construct($str = null, $no = null, $detail = null, $innerException = null)
     {
         parent::__construct($str, $no);
         $this->internal = $detail;
+        $this->inner = $innerException;
     }
 
     public function showError($return = false)
@@ -43,7 +51,7 @@ class Exception extends \Exception
 
     public function showAndLogError($return = false)
     {
-        $this->logError();
+        $this->logErrorToDb();
         $str = '<div class="error">' . Html::escape($this->getMessage()) . "</div>";
         if (!$return) {
             echo $str;
@@ -52,9 +60,9 @@ class Exception extends \Exception
         }
     }
 
-    public function logError($additional = '', $save_trace = false)
+    public function logErrorToDb($additional = '')
     {
-        $trace = '';
+        /*$trace = '';
         if ($save_trace) {
             $trace = "\n Call Stack:\n";
             ob_start();
@@ -62,9 +70,9 @@ class Exception extends \Exception
             var_dump($t);
             $trace .= ob_get_contents();
             ob_end_clean();
-        }
+        }*/
 
-        $this->watchdog($additional . ' - ' . $this->renderFullError() . $trace);
+        self::logToDb($additional, $this);
     }
 
     public function renderFullError()
@@ -75,6 +83,13 @@ class Exception extends \Exception
     public function getInternalError()
     {
         return $this->internal;
+    }
+
+    /**
+     * @return \Exception|Exception|null
+     */
+    public function getInnerException(){
+        return $this->inner;
     }
 
     /**
@@ -119,7 +134,9 @@ class Exception extends \Exception
 
     Pagina Richiesta: " . $_GET['front_controller_page'] . "
 
-    Call Stack:" . $stack;
+    Call Stack:" . $stack
+          . (empty($this->inner) ? '' : ($this->inner instanceof Exception ?
+                $this->inner->renderFullError() : $this->inner->getMessage()));
     }
 
     public function unCaughtEffect()
@@ -128,20 +145,27 @@ class Exception extends \Exception
     }
 
     /**
-     * Aggiunge una linea nel log degli errori
-     * @param $msg : il messaggio da inserire
-     * @param $user : opzionale, l'utente che ha eseguito l'azione che ha scatenato l'errore
+     * @param ExceptionDbWriter $writer
      */
-    static public function watchdog($msg, $user = "")
+    static public function setDbWriter($writer){
+        self::$dbWriter = $writer;
+    }
+
+    /**
+     * Adds a record to the logs table
+     * @param $msg
+     * @param self $ex
+     */
+    static public function logToDb($msg, $ex)
     {
-        if (Site::DB() !== null) {
+        if (self::$dbWriter !== null) {
             try {
-                Site::DB()->query("INSERT INTO LogErrori (Nome, Errore, DataEvento, IP) VALUES ('" . Site::DB()->escape($user) . "','" . Site::DB()->escape($msg) . "',NOW(),'" . Site::DB()->escape($_SERVER['REMOTE_ADDR']) . "')");
-            } catch (DBException $e) {
+                self::$dbWriter->logException($msg, $ex);
+            } catch (\Exception $e) {
                 //Se fallisce perfino questo...registriamo l'errore con l'handler di default di PHP
                 error_log($msg);
             }
-        } else {//No DB enabled
+        } else {//No DB
             error_log($msg);
         }
     }

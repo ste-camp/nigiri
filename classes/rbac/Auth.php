@@ -109,7 +109,7 @@ class Auth
             Site::DB()->commitTransaction();
         } catch (DBException $e) {
             Site::DB()->rollbackTransaction();
-            $e->logError("Cancellazione ruolo");
+            $e->logErrorToDb("Cancellazione ruolo");
             throw new InternalServerError("Si è verificato un errore nella cancellazione del ruolo");
         }
     }
