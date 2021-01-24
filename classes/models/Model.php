@@ -1281,4 +1281,32 @@ abstract class Model
 
         return static::find(array_diff_key($this->loaded_attributes, array($primary_field => 0)));
     }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @param static $that
+     * @return \DateTime|null
+     * @throws \Exception
+     */
+    public static function makeDateTimeOnGet($name, $value, $that) {
+        return !empty($value) ? new \DateTime($value) : null;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param \DateTime|string|null $value
+     * @return string
+     */
+    public static function writeDateTimeOnWrite($fieldName, $value){
+        if($value instanceof \DateTime){
+            return "'".$value->format('Y-m-d H:i:s')."'";
+        }
+        elseif(is_string($value)){
+            return "'".$value."'";
+        }
+        else{
+            return "NULL";
+        }
+    }
 }
